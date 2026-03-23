@@ -3,23 +3,30 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MeWe Academy — La plataforma de entrenamiento con tu nombre</title>
+  <title>MeWe Academy — El sistema operativo del conocimiento organizacional</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
+  <!-- GSAP para animaciones premium -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <style>
     /* ── RESET & BASE ── */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
-      --blue:   #1B3A6B;
-      --blue-l: #2D5AA0;
-      --green:  #059669;
-      --green-l:#10B981;
-      --amber:  #D97706;
-      --text:   #111827;
-      --muted:  #6B7280;
-      --light:  #F9FAFB;
-      --border: #E5E7EB;
+      --navy:    #0A1628;
+      --navy-2:  #111F3A;
+      --blue:    #1B3A6B;
+      --blue-l:  #2563EB;
+      --green:   #059669;
+      --green-l: #10B981;
+      --amber:   #D97706;
+      --text:    #0F172A;
+      --text-2:  #334155;
+      --muted:   #64748B;
+      --light:   #F8FAFC;
+      --border:  #E2E8F0;
+      --white:   #FFFFFF;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -30,829 +37,1033 @@
     }
 
     /* ── LOGO ── */
-    .logo-wrap { display:flex; flex-direction:column; gap:2px; text-decoration:none; }
+    .logo-wrap { display:flex; flex-direction:column; gap:1px; text-decoration:none; }
+    .logo-img { height: 40px; width: auto; display: block; }
+    .logo-placeholder {
+      display: flex; flex-direction: column; gap: 2px; text-decoration: none;
+    }
     .logo-mewe {
-      font-size: 1.9rem; font-weight: 900;
-      letter-spacing: .18em; color: var(--blue);
-      position: relative; display: inline-block;
-      line-height: 1;
+      font-size: 1.75rem; font-weight: 900;
+      letter-spacing: .2em; color: var(--navy);
+      position: relative; display: inline-block; line-height: 1;
     }
     .logo-mewe::after {
-      content:'';
-      position:absolute; left:0; right:0; top:0; bottom:0;
+      content:''; position:absolute; left:0; right:0; top:0; bottom:0;
       background: repeating-linear-gradient(
         180deg,
-        transparent 0px, transparent 7px,
-        rgba(255,255,255,0.75) 7px, rgba(255,255,255,0.75) 9px
+        transparent 0px, transparent 6px,
+        rgba(255,255,255,0.7) 6px, rgba(255,255,255,0.7) 8px
       );
       pointer-events:none;
     }
     .logo-sub {
-      font-size:.6rem; font-weight:700; letter-spacing:.35em;
-      color: var(--green); text-transform:uppercase;
-      padding-left:2px;
+      font-size: .6rem; font-weight: 600;
+      letter-spacing: .35em; color: var(--muted);
+      text-transform: uppercase;
     }
 
     /* ── NAV ── */
     nav {
-      position:fixed; top:0; width:100%; z-index:999;
-      background:rgba(255,255,255,0.96);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid var(--border);
-      padding:.9rem 2rem;
-      display:flex; align-items:center; justify-content:space-between;
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
     }
-    .nav-links { display:flex; gap:2rem; align-items:center; }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items:center; justify-content:space-between;
+      height: 64px;
+    }
+    .nav-links { display:flex; gap:2rem; list-style:none; }
     .nav-links a {
-      color:var(--muted); text-decoration:none; font-size:.9rem; font-weight:500;
-      transition:color .2s;
+      text-decoration:none; color: var(--text-2);
+      font-size:.875rem; font-weight:500;
+      transition: color .2s;
     }
-    .nav-links a:hover { color:var(--blue); }
-    .btn { display:inline-flex; align-items:center; gap:.4rem;
-      padding:.65rem 1.4rem; border-radius:8px;
-      font-weight:700; font-size:.9rem; text-decoration:none; cursor:pointer;
-      transition:all .2s; border:none;
+    .nav-links a:hover { color: var(--blue-l); }
+    .nav-ctas { display:flex; gap:.75rem; align-items:center; }
+    .btn-ghost {
+      padding: .5rem 1.25rem; border-radius: 8px;
+      font-size:.875rem; font-weight:600; cursor:pointer;
+      background:transparent; border:1.5px solid var(--border);
+      color: var(--text); text-decoration:none; transition:all .2s;
     }
-    .btn-primary { background:var(--blue); color:#fff; }
-    .btn-primary:hover { background:var(--blue-l); transform:translateY(-1px); box-shadow:0 4px 14px rgba(27,58,107,.25); }
-    .btn-outline { background:transparent; color:var(--blue); border:2px solid var(--blue); }
-    .btn-outline:hover { background:var(--blue); color:#fff; }
-    .btn-green { background:var(--green); color:#fff; }
-    .btn-green:hover { background:var(--green-l); transform:translateY(-1px); box-shadow:0 4px 14px rgba(5,150,105,.3); }
-    .btn-lg { padding:.9rem 2rem; font-size:1rem; border-radius:10px; }
+    .btn-ghost:hover { border-color: var(--blue-l); color: var(--blue-l); }
+    .btn-primary {
+      padding: .5rem 1.25rem; border-radius: 8px;
+      font-size:.875rem; font-weight:600; cursor:pointer;
+      background: var(--navy); color:#fff;
+      border: none; text-decoration:none; transition:all .2s;
+    }
+    .btn-primary:hover { background: var(--blue); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(10,22,40,.25); }
 
     /* ── HERO ── */
     .hero {
-      padding: 9rem 2rem 5rem;
-      max-width: 1200px; margin:0 auto;
-      display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center;
+      max-width: 1200px; margin: 0 auto;
+      padding: 6rem clamp(1.5rem, 5vw, 4rem) 4rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
     }
-    .hero-badge {
-      display:inline-flex; align-items:center; gap:.4rem;
-      background:rgba(5,150,105,.08); border:1px solid rgba(5,150,105,.2);
-      color:var(--green); padding:.3rem .85rem; border-radius:999px;
-      font-size:.75rem; font-weight:700; letter-spacing:.06em;
-      text-transform:uppercase; margin-bottom:1.5rem;
+    .hero-eyebrow {
+      font-size: .7rem; font-weight: 700;
+      letter-spacing: .2em; color: var(--blue-l);
+      text-transform: uppercase; margin-bottom: 1.25rem;
+      display: inline-flex; align-items: center; gap: .5rem;
+    }
+    .hero-category {
+      font-size: .85rem; font-weight: 700;
+      letter-spacing: .12em; color: var(--muted);
+      text-transform: uppercase; margin-bottom: .75rem;
     }
     .hero h1 {
-      font-size: clamp(2.2rem, 4vw, 3.2rem);
-      font-weight:900; line-height:1.1; color:var(--blue);
-      margin-bottom:1.5rem;
+      font-size: clamp(2.4rem, 4.5vw, 3.5rem);
+      font-weight: 900; line-height: 1.1;
+      color: var(--navy); margin-bottom: 1.25rem;
     }
-    .hero h1 em { font-style:normal; color:var(--amber); }
-    .hero p {
-      font-size:1.1rem; color:var(--muted); line-height:1.75;
-      margin-bottom:2rem; max-width:520px;
+    .hero h1 .accent { color: var(--amber); }
+    .hero-subtitle {
+      font-size: 1.125rem; color: var(--text-2);
+      line-height: 1.7; margin-bottom: .75rem;
+      font-weight: 400;
     }
-    .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2.5rem; }
-    .hero-proof {
-      display:flex; gap:2rem; flex-wrap:wrap;
-      padding-top:1.5rem; border-top:1px solid var(--border);
+    .hero-tagline {
+      font-size: 1rem; color: var(--muted);
+      font-style: italic; margin-bottom: 2rem;
+      padding-left: 1rem; border-left: 3px solid var(--blue-l);
     }
-    .proof-item { display:flex; flex-direction:column; }
-    .proof-num { font-size:1.6rem; font-weight:900; color:var(--blue); line-height:1; }
-    .proof-label { font-size:.75rem; color:var(--muted); margin-top:.2rem; }
+    .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; }
+    .btn-hero {
+      padding: .875rem 2rem; border-radius: 10px;
+      font-size:1rem; font-weight:700; cursor:pointer;
+      text-decoration:none; transition:all .25s;
+      display: inline-flex; align-items:center; gap:.5rem;
+    }
+    .btn-hero-primary {
+      background: var(--navy); color:#fff; border:none;
+      box-shadow: 0 4px 16px rgba(10,22,40,.2);
+    }
+    .btn-hero-primary:hover { transform:translateY(-2px); box-shadow: 0 8px 24px rgba(10,22,40,.3); }
+    .btn-hero-outline {
+      background: transparent; color: var(--navy);
+      border: 1.5px solid var(--border);
+    }
+    .btn-hero-outline:hover { border-color: var(--navy); }
 
-    /* Hero right — visual mock */
-    .hero-visual {
-      background:var(--light);
-      border-radius:20px; border:1px solid var(--border);
-      overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.08);
+    /* ── DASHBOARD MOCK ── */
+    .dashboard-mock {
+      background: var(--navy-2);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 32px 64px rgba(10,22,40,.35), 0 0 0 1px rgba(255,255,255,.06);
+      will-change: transform;
     }
-    .hv-bar {
-      background:var(--blue); padding:.75rem 1.25rem;
-      display:flex; align-items:center; gap:.5rem;
+    .mock-bar {
+      background: rgba(255,255,255,.06);
+      padding: .75rem 1.25rem;
+      display: flex; align-items: center; gap: .5rem;
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .hv-dot { width:10px; height:10px; border-radius:50%; }
-    .hv-bar-title { color:rgba(255,255,255,.8); font-size:.8rem; font-weight:600; margin-left:.5rem; flex:1; }
-    .hv-body { padding:1.5rem; }
-    .hv-stat { display:flex; justify-content:space-between; align-items:center;
-      padding:.75rem 0; border-bottom:1px solid var(--border); }
-    .hv-stat:last-child { border:none; }
-    .hv-stat-label { font-size:.85rem; color:var(--muted); }
-    .hv-stat-val { font-size:1.1rem; font-weight:800; color:var(--blue); }
-    .hv-progress { margin-top:1rem; }
-    .hv-progress-label { display:flex; justify-content:space-between; font-size:.8rem; color:var(--muted); margin-bottom:.4rem; }
-    .hv-bar-fill { height:8px; border-radius:999px; background:var(--border); overflow:hidden; }
-    .hv-bar-fill-inner { height:100%; border-radius:999px; background:linear-gradient(90deg, var(--green), var(--green-l)); }
-    .hv-tag { display:inline-flex; align-items:center; gap:.3rem;
-      padding:.2rem .6rem; border-radius:6px; font-size:.75rem; font-weight:700; }
-    .tag-green { background:rgba(5,150,105,.1); color:var(--green); }
-    .tag-blue { background:rgba(27,58,107,.1); color:var(--blue); }
-    .tag-amber { background:rgba(217,119,6,.1); color:var(--amber); }
+    .mock-dot { width:10px; height:10px; border-radius:50%; }
+    .mock-title { color: rgba(255,255,255,.7); font-size:.8rem; font-weight:600; margin-left:.5rem; flex:1; }
+    .mock-live { font-size:.7rem; color: #10B981; font-weight:700; letter-spacing:.05em; }
+    .mock-body { padding: 1.25rem; display:flex; flex-direction:column; gap:1rem; }
+    .mock-chips { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .chip {
+      font-size: .7rem; font-weight:600; padding:.3rem .75rem;
+      border-radius:20px; letter-spacing:.02em;
+    }
+    .chip-blue { background:rgba(37,99,235,.2); color:#93C5FD; }
+    .chip-green { background:rgba(16,185,129,.2); color:#6EE7B7; }
+    .chip-amber { background:rgba(217,119,6,.2); color:#FCD34D; }
+    .mock-metric {
+      display:flex; justify-content:space-between; align-items:center;
+      color: rgba(255,255,255,.85); font-size:.825rem;
+    }
+    .metric-val { font-weight:700; color: #10B981; font-size:.9rem; }
+    .mock-bar-wrap { background:rgba(255,255,255,.08); border-radius:4px; height:5px; overflow:hidden; }
+    .mock-bar-fill { height:100%; border-radius:4px; background: linear-gradient(90deg, #2563EB, #10B981); transition: width 1.5s ease; }
+    .mock-card {
+      background: rgba(255,255,255,.05); border-radius:10px;
+      padding: .875rem; border: 1px solid rgba(255,255,255,.08);
+    }
+    .mock-card-tag { font-size:.65rem; font-weight:700; color:#EF4444; letter-spacing:.1em; margin-bottom:.4rem; }
+    .mock-card-title { color:rgba(255,255,255,.9); font-size:.825rem; font-weight:600; margin-bottom:.25rem; }
+    .mock-card-sub { color:rgba(255,255,255,.4); font-size:.72rem; }
+    /* Logo placeholder box */
+    .logo-img-placeholder {
+      width: 52px; height: 52px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy), var(--blue-l));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 900; color: #fff;
+      letter-spacing: .08em; text-align: center; line-height: 1.2;
+      border: 2px dashed rgba(37,99,235,.5);
+    }
 
-    /* ── SECTIONS ── */
-    section { padding:5rem 2rem; }
-    .container { max-width:1100px; margin:0 auto; }
-    .sec-label {
-      display:inline-block; font-size:.75rem; font-weight:700;
-      letter-spacing:.1em; text-transform:uppercase; color:var(--green);
-      margin-bottom:.75rem;
+    /* ── SECTION WRAPPER ── */
+    .section { padding: 6rem clamp(1.5rem, 5vw, 4rem); }
+    .section-inner { max-width:1200px; margin:0 auto; }
+    .section-tag {
+      font-size:.7rem; font-weight:700; letter-spacing:.15em;
+      color: var(--blue-l); text-transform:uppercase;
+      margin-bottom:.75rem; display:block;
     }
-    .sec-title {
-      font-size:clamp(1.9rem,3.5vw,2.6rem); font-weight:900;
-      color:var(--blue); line-height:1.15; margin-bottom:1rem;
+    .section-h2 {
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight:800; color:var(--navy); line-height:1.2;
+      margin-bottom:1rem;
     }
-    .sec-sub { color:var(--muted); font-size:1.05rem; line-height:1.75; max-width:640px; }
-    .text-center { text-align:center; }
-    .text-center .sec-sub { margin:0 auto; }
+    .section-lead {
+      font-size:1.125rem; color:var(--text-2); max-width:640px; line-height:1.75;
+    }
 
-    /* ── PROBLEM BAND ── */
-    .problem-band { background:var(--blue); color:#fff; }
-    .problem-band .sec-title { color:#fff; }
-    .problem-band .sec-sub { color:rgba(255,255,255,.7); }
-    .problem-stats {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:1.5rem; margin-top:3rem;
+    /* ── STATS BAND ── */
+    .stats-band {
+      background: var(--navy); color:#fff;
+      padding: 3.5rem clamp(1.5rem, 5vw, 4rem);
     }
-    .pstat {
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
-      border-radius:16px; padding:1.75rem; text-align:center;
+    .stats-grid {
+      max-width:1200px; margin:0 auto;
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap:2rem; text-align:center;
     }
-    .pstat-num { font-size:3rem; font-weight:900; color:#fff; line-height:1; margin-bottom:.5rem; }
-    .pstat-label { font-size:.9rem; color:rgba(255,255,255,.65); line-height:1.5; }
-    .pstat-source { font-size:.7rem; color:rgba(255,255,255,.35); margin-top:.5rem; }
+    .stat-num {
+      font-size:2.75rem; font-weight:900;
+      color:#fff; line-height:1;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-num .stat-suffix { color: var(--green-l); }
+    .stat-label { font-size:.825rem; color:rgba(255,255,255,.55); margin-top:.4rem; font-weight:500; }
 
-    /* ── PARA QUIÉN ── */
-    .for-who { background:var(--light); }
-    .who-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:3rem; }
-    .who-card {
-      background:#fff; border-radius:16px; padding:2rem;
-      border:1px solid var(--border);
-      transition:box-shadow .3s, border-color .3s, transform .3s;
+    /* ── TRUSTED BY ── */
+    .trusted {
+      background: var(--light);
+      padding: 4rem clamp(1.5rem, 5vw, 4rem);
+      text-align: center;
     }
-    .who-card:hover { box-shadow:0 8px 30px rgba(0,0,0,.08); border-color:var(--blue); transform:translateY(-3px); }
-    .who-icon { font-size:2.2rem; margin-bottom:1rem; }
-    .who-card h3 { font-size:1.2rem; font-weight:800; color:var(--blue); margin-bottom:.6rem; }
-    .who-card p { color:var(--muted); font-size:.95rem; line-height:1.7; }
+    .trusted-heading {
+      font-size:.8rem; font-weight:700; letter-spacing:.15em;
+      color:var(--muted); text-transform:uppercase; margin-bottom:2.5rem;
+      max-width:600px; margin-left:auto; margin-right:auto; line-height:1.7;
+    }
+    .trusted-logos {
+      display:flex; flex-wrap:wrap; justify-content:center;
+      align-items:center; gap:2rem; max-width:900px; margin:0 auto;
+    }
+    .trusted-logo-item {
+      background:#fff; border:1px solid var(--border);
+      border-radius:12px; padding:.875rem 1.75rem;
+      font-size:.8rem; font-weight:700; color:var(--muted);
+      letter-spacing:.05em; text-transform:uppercase;
+      transition: all .25s;
+    }
+    .trusted-logo-item:hover { border-color:var(--blue-l); color:var(--blue-l); transform:translateY(-2px); }
+
+    /* ── COMPARISON ── */
+    .comparison-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:2rem; margin-top:2.5rem;
+    }
+    .comp-card {
+      border-radius:16px; padding:2rem; border:1px solid var(--border);
+    }
+    .comp-card.legacy {
+      background:#FAFAFA;
+    }
+    .comp-card.mewe-card {
+      background: var(--navy);
+      border-color: transparent;
+      box-shadow: 0 16px 48px rgba(10,22,40,.2);
+    }
+    .comp-label {
+      font-size:.7rem; font-weight:700; letter-spacing:.15em;
+      text-transform:uppercase; margin-bottom:1.25rem; display:block;
+    }
+    .comp-label.old { color:var(--muted); }
+    .comp-label.new { color:var(--green-l); }
+    .comp-title { font-size:1.25rem; font-weight:800; margin-bottom:1.5rem; }
+    .comp-card.legacy .comp-title { color:var(--text-2); }
+    .comp-card.mewe-card .comp-title { color:#fff; }
+    .comp-list { list-style:none; display:flex; flex-direction:column; gap:.75rem; }
+    .comp-item {
+      display:flex; gap:.75rem; align-items:flex-start;
+      font-size:.9rem; line-height:1.5;
+    }
+    .comp-card.legacy .comp-item { color:var(--muted); }
+    .comp-card.mewe-card .comp-item { color:rgba(255,255,255,.85); }
+    .comp-icon { font-size:1rem; flex-shrink:0; margin-top:.1rem; }
 
     /* ── FEATURES ── */
-    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.25rem; margin-top:3rem; }
-    .feat {
-      padding:1.75rem; border-radius:14px; border:1px solid var(--border);
-      transition:border-color .3s, box-shadow .3s;
+    .features-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
+      gap:1.5rem; margin-top:2.5rem;
     }
-    .feat:hover { border-color:var(--green); box-shadow:0 4px 20px rgba(5,150,105,.08); }
-    .feat-icon {
+    .feature-card {
+      background:var(--light); border-radius:14px;
+      padding:1.75rem; border:1px solid var(--border);
+      transition: all .3s; cursor:default;
+    }
+    .feature-card:hover {
+      transform:translateY(-5px);
+      box-shadow:0 16px 40px rgba(10,22,40,.1);
+      border-color:rgba(37,99,235,.3);
+    }
+    .feature-icon {
       width:44px; height:44px; border-radius:10px;
       display:flex; align-items:center; justify-content:center;
-      font-size:1.3rem; margin-bottom:1rem;
+      font-size:1.25rem; margin-bottom:1rem;
+      background: linear-gradient(135deg, rgba(37,99,235,.1), rgba(16,185,129,.1));
     }
-    .fi-blue { background:rgba(27,58,107,.08); }
-    .fi-green { background:rgba(5,150,105,.08); }
-    .fi-amber { background:rgba(217,119,6,.08); }
-    .feat h4 { font-size:1rem; font-weight:700; color:var(--blue); margin-bottom:.4rem; }
-    .feat p { font-size:.875rem; color:var(--muted); line-height:1.65; }
-    .feat-metric { display:inline-block; margin-top:.75rem; font-size:.75rem; font-weight:700;
-      color:var(--green); background:rgba(5,150,105,.08); padding:.2rem .6rem; border-radius:6px; }
+    .feature-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:.5rem; }
+    .feature-desc { font-size:.875rem; color:var(--muted); line-height:1.65; }
+    .feature-metric { font-size:.75rem; font-weight:700; color:var(--green); margin-top:.75rem; }
 
-    /* ── HOW ── */
-    .how { background:var(--light); }
-    .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:2rem; margin-top:3.5rem; position:relative; }
-    .step-card { text-align:center; padding:1.5rem; }
-    .step-num {
-      width:52px; height:52px; border-radius:50%;
-      background:var(--blue); color:#fff;
-      font-size:1.2rem; font-weight:900;
-      display:flex; align-items:center; justify-content:center;
-      margin:0 auto 1rem;
-    }
-    .step-card h4 { font-weight:800; color:var(--blue); font-size:1rem; margin-bottom:.4rem; }
-    .step-card p { font-size:.875rem; color:var(--muted); line-height:1.65; }
-
-    /* ── DIFFERENTIATORS ── */
-    .diff-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; margin-top:3rem; }
-    .diff-item {
-      display:flex; gap:1rem; align-items:flex-start;
-      padding:1.5rem; border-radius:12px;
+    /* ── HOW IT WORKS ── */
+    .steps { display:flex; flex-direction:column; gap:1.5rem; margin-top:2.5rem; }
+    .step {
+      display:flex; gap:1.5rem; align-items:flex-start;
+      padding:1.5rem; border-radius:14px;
       border:1px solid var(--border); background:#fff;
-      transition:border-color .3s;
+      transition: all .3s;
     }
-    .diff-item:hover { border-color:var(--green); }
-    .diff-check { font-size:1.3rem; flex-shrink:0; margin-top:.1rem; }
-    .diff-item h4 { font-size:.95rem; font-weight:700; color:var(--blue); margin-bottom:.3rem; }
-    .diff-item p { font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .step:hover { box-shadow:0 8px 32px rgba(10,22,40,.08); border-color:rgba(37,99,235,.25); }
+    .step-num {
+      width:40px; height:40px; border-radius:10px; flex-shrink:0;
+      background:var(--navy); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.875rem; font-weight:800;
+    }
+    .step-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:.35rem; }
+    .step-desc { font-size:.875rem; color:var(--muted); line-height:1.6; }
 
     /* ── PRICING ── */
-    .pricing { background:var(--light); }
-    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:3.5rem; align-items:start; }
+    .pricing-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
+      gap:1.5rem; margin-top:2.5rem;
+    }
     .price-card {
-      background:#fff; border-radius:20px; padding:2.25rem 2rem;
-      border:2px solid var(--border);
-      transition:transform .3s, box-shadow .3s;
-      position:relative;
-    }
-    .price-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.1); }
-    .price-card.recommended {
-      border-color:var(--blue);
-      box-shadow:0 8px 30px rgba(27,58,107,.15);
-    }
-    .rec-badge {
-      position:absolute; top:-14px; left:50%; transform:translateX(-50%);
-      background:var(--blue); color:#fff;
-      padding:.3rem 1.1rem; border-radius:999px;
-      font-size:.72rem; font-weight:800; white-space:nowrap; letter-spacing:.04em;
-    }
-    .plan-name { font-size:.8rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem; }
-    .plan-price { display:flex; align-items:baseline; gap:.3rem; margin-bottom:.25rem; }
-    .plan-price .currency { font-size:1.4rem; font-weight:700; color:var(--blue); }
-    .plan-price .amount { font-size:3.2rem; font-weight:900; color:var(--blue); line-height:1; }
-    .plan-price .period { font-size:.9rem; color:var(--muted); }
-    .plan-desc { font-size:.85rem; color:var(--muted); margin-bottom:1.75rem; line-height:1.5; }
-    .plan-features { list-style:none; margin-bottom:2rem; display:flex; flex-direction:column; gap:.7rem; }
-    .plan-features li { display:flex; gap:.6rem; font-size:.875rem; color:var(--text); align-items:flex-start; }
-    .plan-features li::before { content:'✓'; color:var(--green); font-weight:800; flex-shrink:0; margin-top:.05rem; }
-    .plan-limit { color:var(--muted); font-size:.8rem; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); text-align:center; }
-
-    /* ── SOCIAL PROOF ── */
-    .proof-section { background:#fff; }
-    .logos-row { display:flex; flex-wrap:wrap; gap:2.5rem; justify-content:center; align-items:center; margin:2.5rem 0; }
-    .logo-placeholder {
-      height:36px; display:flex; align-items:center; justify-content:center;
-      font-size:.85rem; font-weight:700; color:#CBD5E1; letter-spacing:.1em;
-      border:1px dashed #E2E8F0; padding:.5rem 1.25rem; border-radius:8px;
-    }
-    .testimonials { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:2rem; }
-    .testi {
-      background:var(--light); border-radius:14px; padding:1.75rem;
+      border-radius:16px; padding:2rem;
       border:1px solid var(--border);
+      transition: all .3s; position:relative; overflow:hidden;
     }
-    .testi-quote { font-size:.95rem; color:var(--text); line-height:1.7; margin-bottom:1.25rem; font-style:italic; }
-    .testi-quote::before { content:'"'; font-size:2rem; color:var(--green); line-height:0; vertical-align:-.4em; margin-right:.2rem; }
-    .testi-author { display:flex; gap:.75rem; align-items:center; }
-    .testi-avatar { width:40px; height:40px; border-radius:50%; background:var(--blue); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:.9rem; flex-shrink:0; }
-    .testi-name { font-size:.875rem; font-weight:700; color:var(--blue); }
-    .testi-role { font-size:.78rem; color:var(--muted); }
-    .testi-metric { display:inline-block; margin-top:.75rem; font-size:.75rem; font-weight:700; color:var(--green); background:rgba(5,150,105,.08); padding:.2rem .6rem; border-radius:6px; }
+    .price-card:hover { transform:translateY(-4px); }
+    .price-card.starter { background:#fff; }
+    .price-card.pro {
+      background:var(--navy);
+      border-color:transparent;
+      box-shadow: 0 24px 64px rgba(10,22,40,.25);
+    }
+    .price-card.enterprise { background:var(--light); }
+    .price-badge {
+      position:absolute; top:1.25rem; right:1.25rem;
+      font-size:.65rem; font-weight:700; letter-spacing:.1em;
+      padding:.3rem .75rem; border-radius:20px; text-transform:uppercase;
+    }
+    .price-badge.recommended {
+      background:var(--green-l); color:#fff;
+    }
+    .price-name { font-size:.75rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; margin-bottom:.75rem; }
+    .price-card.starter .price-name { color:var(--muted); }
+    .price-card.pro .price-name { color:var(--green-l); }
+    .price-card.enterprise .price-name { color:var(--blue-l); }
+    .price-amount {
+      font-size:3rem; font-weight:900; line-height:1;
+      margin-bottom:.25rem;
+    }
+    .price-card.starter .price-amount { color:var(--navy); }
+    .price-card.pro .price-amount { color:#fff; }
+    .price-card.enterprise .price-amount { color:var(--navy); }
+    .price-period { font-size:.875rem; color:var(--muted); margin-bottom:1.5rem; }
+    .price-card.pro .price-period { color:rgba(255,255,255,.55); }
+    .price-divider { height:1px; background:var(--border); margin:1.5rem 0; }
+    .price-card.pro .price-divider { background:rgba(255,255,255,.1); }
+    .price-features { list-style:none; display:flex; flex-direction:column; gap:.7rem; margin-bottom:2rem; }
+    .price-feature { display:flex; gap:.6rem; font-size:.875rem; align-items:flex-start; }
+    .price-card.starter .price-feature { color:var(--text-2); }
+    .price-card.pro .price-feature { color:rgba(255,255,255,.85); }
+    .price-card.enterprise .price-feature { color:var(--text-2); }
+    .price-check { color:var(--green); font-weight:700; flex-shrink:0; }
+    .price-card.pro .price-check { color:var(--green-l); }
+    .price-cta {
+      width:100%; padding:.875rem; border-radius:10px;
+      font-size:.9rem; font-weight:700; cursor:pointer;
+      text-align:center; text-decoration:none; display:block; transition:all .25s;
+    }
+    .price-cta.starter-cta {
+      background:var(--light); color:var(--navy);
+      border:1.5px solid var(--border);
+    }
+    .price-cta.starter-cta:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
+    .price-cta.pro-cta {
+      background:var(--green-l); color:var(--navy); border:none;
+    }
+    .price-cta.pro-cta:hover { background:#34D399; transform:translateY(-1px); }
+    .price-cta.enterprise-cta {
+      background:var(--navy); color:#fff; border:none;
+    }
+    .price-cta.enterprise-cta:hover { background:var(--blue); }
+    .pricing-note {
+      text-align:center; margin-top:1.5rem;
+      font-size:.875rem; color:var(--muted); font-style:italic;
+    }
+    .pricing-note strong { color:var(--navy); }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
+      gap:1.5rem; margin-top:2.5rem;
+    }
+    .testimonial {
+      background:var(--light); border-radius:14px;
+      padding:1.75rem; border:1px solid var(--border);
+      transition:all .3s;
+    }
+    .testimonial:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(10,22,40,.08); }
+    .testimonial-quote { font-size:.95rem; color:var(--text-2); line-height:1.75; margin-bottom:1.25rem; font-style:italic; }
+    .testimonial-author { display:flex; gap:.75rem; align-items:center; }
+    .author-avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:linear-gradient(135deg, var(--blue-l), var(--green));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; color:#fff; font-size:.875rem; flex-shrink:0;
+    }
+    .author-name { font-size:.875rem; font-weight:700; color:var(--navy); }
+    .author-role { font-size:.75rem; color:var(--muted); }
+    .stars { color:#F59E0B; font-size:.8rem; margin-bottom:.75rem; }
 
     /* ── FAQ ── */
-    .faq { background:var(--light); }
-    .faq-list { max-width:720px; margin:2.5rem auto 0; display:flex; flex-direction:column; gap:.75rem; }
-    .faq-item { background:#fff; border-radius:12px; border:1px solid var(--border); overflow:hidden; }
-    .faq-q {
-      width:100%; background:none; border:none; cursor:pointer;
-      display:flex; justify-content:space-between; align-items:center;
-      padding:1.25rem 1.5rem; font-size:.95rem; font-weight:700; color:var(--blue);
-      text-align:left; gap:1rem;
+    .faq-list { max-width:720px; margin:2.5rem auto 0; display:flex; flex-direction:column; gap:1px; }
+    details {
+      border:1px solid var(--border); border-radius:12px;
+      overflow:hidden; margin-bottom:.5rem;
+      background:#fff; transition:all .2s;
     }
-    .faq-q span { transition:transform .3s; font-size:1.2rem; color:var(--muted); flex-shrink:0; }
-    .faq-a { padding:0 1.5rem 1.25rem; font-size:.9rem; color:var(--muted); line-height:1.75; }
-    details[open] .faq-q span { transform:rotate(45deg); }
+    details[open] { box-shadow:0 4px 16px rgba(10,22,40,.08); }
+    summary {
+      padding:1.25rem 1.5rem; font-weight:600; font-size:.95rem;
+      cursor:pointer; color:var(--navy);
+      display:flex; justify-content:space-between; align-items:center;
+      list-style:none;
+    }
+    summary::-webkit-details-marker { display:none; }
+    summary::after {
+      content:'↓'; font-size:.8rem; color:var(--muted);
+      transition:transform .3s; flex-shrink:0; margin-left:1rem;
+    }
+    details[open] summary::after { transform:rotate(180deg); }
+    .faq-answer { padding:0 1.5rem 1.25rem; font-size:.9rem; color:var(--muted); line-height:1.75; }
 
     /* ── GUARANTEE ── */
-    .guarantee { background:var(--blue); color:#fff; text-align:center; padding:3rem 2rem; }
-    .guarantee h3 { font-size:1.5rem; font-weight:900; margin-bottom:.75rem; }
-    .guarantee p { color:rgba(255,255,255,.75); font-size:1rem; max-width:520px; margin:0 auto; }
+    .guarantee {
+      background:var(--light); border-radius:20px;
+      padding:3rem; text-align:center; margin-top:2.5rem;
+      border:1px solid var(--border);
+    }
+    .guarantee-icon { font-size:2.5rem; margin-bottom:.75rem; }
+    .guarantee h3 { font-size:1.4rem; font-weight:800; color:var(--navy); margin-bottom:.75rem; }
+    .guarantee p { font-size:.95rem; color:var(--muted); max-width:520px; margin:0 auto; line-height:1.75; }
 
-    /* ── CTA FINAL ── */
-    .cta-final { text-align:center; padding:6rem 2rem; }
-    .cta-final h2 { font-size:clamp(2rem,4vw,2.8rem); font-weight:900; color:var(--blue); margin-bottom:1rem; }
-    .cta-final p { color:var(--muted); font-size:1.1rem; margin-bottom:2.5rem; max-width:500px; margin-left:auto; margin-right:auto; }
-    .cta-meta { margin-top:1rem; font-size:.8rem; color:var(--muted); }
+    /* ── FINAL CTA ── */
+    .cta-section {
+      background:var(--navy);
+      padding:6rem clamp(1.5rem, 5vw, 4rem);
+      text-align:center;
+    }
+    .cta-section h2 { font-size:clamp(1.8rem, 3.5vw, 2.8rem); font-weight:900; color:#fff; margin-bottom:1rem; }
+    .cta-section p { font-size:1.1rem; color:rgba(255,255,255,.6); margin-bottom:2.5rem; max-width:560px; margin-left:auto; margin-right:auto; line-height:1.7; }
+    .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+    .btn-cta-white {
+      padding:.875rem 2rem; border-radius:10px;
+      background:#fff; color:var(--navy); font-weight:700;
+      text-decoration:none; transition:all .25s;
+      font-size:.95rem;
+    }
+    .btn-cta-white:hover { background:rgba(255,255,255,.9); transform:translateY(-2px); }
+    .btn-cta-outline {
+      padding:.875rem 2rem; border-radius:10px;
+      background:transparent; color:rgba(255,255,255,.8);
+      border:1.5px solid rgba(255,255,255,.25); font-weight:700;
+      text-decoration:none; transition:all .25s; font-size:.95rem;
+    }
+    .btn-cta-outline:hover { border-color:rgba(255,255,255,.6); color:#fff; }
 
     /* ── FOOTER ── */
     footer {
-      background:var(--text); color:rgba(255,255,255,.6);
-      padding:2.5rem 2rem; text-align:center; font-size:.85rem;
+      background:var(--navy); border-top:1px solid rgba(255,255,255,.08);
+      padding:2rem clamp(1.5rem, 5vw, 4rem);
     }
-    footer strong { color:#fff; }
-    .footer-links { display:flex; gap:2rem; justify-content:center; margin-top:.75rem; flex-wrap:wrap; }
-    .footer-links a { color:rgba(255,255,255,.5); text-decoration:none; font-size:.8rem; }
-    .footer-links a:hover { color:#fff; }
+    .footer-inner {
+      max-width:1200px; margin:0 auto;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:1rem;
+    }
+    .footer-logo { color:#fff; font-weight:900; letter-spacing:.15em; font-size:1rem; }
+    .footer-copy { font-size:.8rem; color:rgba(255,255,255,.35); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity:0; transform:translateY(30px); }
 
     /* ── RESPONSIVE ── */
-    @media(max-width:768px) {
-      .hero { grid-template-columns:1fr; gap:2rem; padding-top:7rem; }
-      .hero-visual { display:none; }
-      .nav-links .btn-outline { display:none; }
-    }
-    @media(max-width:480px) {
-      .nav-links { gap:1rem; }
-      nav { padding:.9rem 1rem; }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns:1fr; gap:2.5rem; }
+      .comparison-grid { grid-template-columns:1fr; }
+      .nav-links { display:none; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── NAV ── -->
+<!-- ═══════════ NAV ═══════════ -->
 <nav>
-  <a href="#" class="logo-wrap">
-    <div class="logo-mewe">MEWE</div>
-    <div class="logo-sub">Academy</div>
-  </a>
-  <div class="nav-links">
-    <a href="#quienes">¿Para quién?</a>
-    <a href="#funciones">Funciones</a>
-    <a href="#precios">Precios</a>
-    <a href="#contacto" class="btn btn-outline">Ver demo</a>
-    <a href="#contacto" class="btn btn-primary">Solicitar demo →</a>
+  <div class="nav-inner">
+    <a href="#" class="logo-placeholder">
+      <!-- LOGO PLACEHOLDER: reemplaza con <img src="img/mewe-logo.svg"> cuando tengas el logo -->
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <span class="logo-mewe">MEWE</span>
+        <span class="logo-sub">Academy</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#para-quien">¿Para quién?</a></li>
+      <li><a href="#funciones">Funciones</a></li>
+      <li><a href="#precios">Precios</a></li>
+    </ul>
+    <div class="nav-ctas">
+      <a href="#precios" class="btn-ghost">Ver demo</a>
+      <a href="#precios" class="btn-primary">Solicitar demo →</a>
+    </div>
   </div>
 </nav>
 
-<!-- ── HERO ── -->
-<div style="max-width:1200px;margin:0 auto;">
-  <div class="hero">
-    <!-- Left: Copy -->
-    <div>
-      <div class="hero-badge">🧠 Basado en neurociencia del aprendizaje</div>
-      <h1>El <em>70% de lo que tu equipo aprende hoy,</em> lo olvidará en 48 horas.</h1>
-      <p>MeWe Academy es la plataforma de entrenamiento que tu organización administra con su nombre, su identidad y sus reglas — diseñada para que el conocimiento se quede, no que se pierda.</p>
+<!-- ═══════════ HERO ═══════════ -->
+<section style="max-width:1200px;margin:0 auto;padding:6rem clamp(1.5rem,5vw,4rem) 4rem;">
+  <div class="hero" style="max-width:100%;margin:0;padding:0;">
+    <div class="hero-content">
+      <span class="hero-category">EL SISTEMA OPERATIVO DEL CONOCIMIENTO ORGANIZACIONAL</span>
+      <span class="hero-eyebrow">🧠 BASADO EN NEUROCIENCIA DEL APRENDIZAJE</span>
+      <h1>
+        El <span class="accent">70% de lo que tu equipo aprende hoy</span>,
+        lo olvidará en 48 horas.
+      </h1>
+      <p class="hero-subtitle">
+        MeWe Academy es la plataforma de entrenamiento que tu organización administra
+        con su nombre, su identidad y sus reglas.
+      </p>
+      <p class="hero-tagline">Donde el aprendizaje deja de ser contenido… y se convierte en infraestructura.</p>
       <div class="hero-btns">
-        <a href="#contacto" class="btn btn-primary btn-lg">Solicitar demo gratuita →</a>
-        <a href="#funciones" class="btn btn-outline btn-lg">Ver funciones</a>
-      </div>
-      <div class="hero-proof">
-        <div class="proof-item">
-          <span class="proof-num">38%</span>
-          <span class="proof-label">más retención<br>de conocimiento</span>
-        </div>
-        <div class="proof-item">
-          <span class="proof-num">6 sem.</span>
-          <span class="proof-label">implementación<br>promedio</span>
-        </div>
-        <div class="proof-item">
-          <span class="proof-num">100%</span>
-          <span class="proof-label">tu marca<br>tu identidad</span>
-        </div>
+        <a href="#precios" class="btn-hero btn-hero-primary">Solicitar demo gratuita →</a>
+        <a href="#funciones" class="btn-hero btn-hero-outline">Ver funciones</a>
       </div>
     </div>
-
-    <!-- Right: Visual mock del dashboard -->
-    <div class="hero-visual">
-      <div class="hv-bar">
-        <div class="hv-dot" style="background:#FF5F56"></div>
-        <div class="hv-dot" style="background:#FFBD2E"></div>
-        <div class="hv-dot" style="background:#27C93F"></div>
-        <div class="hv-bar-title">MeWe Academy — Panel del Maestro</div>
-        <div class="hv-tag tag-green">● En vivo</div>
+    <div class="dashboard-mock hero-mock">
+      <!-- Logo placeholder en el mock -->
+      <div class="mock-bar">
+        <span class="mock-dot" style="background:#EF4444;"></span>
+        <span class="mock-dot" style="background:#F59E0B;"></span>
+        <span class="mock-dot" style="background:#10B981;"></span>
+        <span class="mock-title">MeWe Academy — Panel del Maestro</span>
+        <span class="mock-live">● En vivo</span>
       </div>
-      <div class="hv-body">
-        <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-          <span class="hv-tag tag-blue">📚 12 cursos activos</span>
-          <span class="hv-tag tag-green">✓ 247 alumnos</span>
-          <span class="hv-tag tag-amber">🎓 18 certificados</span>
+      <div class="mock-body">
+        <!-- IMAGEN DEL DASHBOARD: coloca img/dashboard.png cuando la generes -->
+        <div class="mock-chips">
+          <span class="chip chip-blue">📚 12 cursos activos</span>
+          <span class="chip chip-green">✓ 247 alumnos</span>
+          <span class="chip chip-amber">🎓 18 certificados</span>
         </div>
-        <div class="hv-stat">
-          <span class="hv-stat-label">Retención de conocimiento</span>
-          <span class="hv-stat-val" style="color:var(--green)">91%</span>
-        </div>
-        <div class="hv-stat">
-          <span class="hv-stat-label">Cursos completados este mes</span>
-          <span class="hv-stat-val">34</span>
-        </div>
-        <div class="hv-stat">
-          <span class="hv-stat-label">Alumnos activos hoy</span>
-          <span class="hv-stat-val">62</span>
-        </div>
-        <div class="hv-progress">
-          <div class="hv-progress-label">
+        <div style="display:flex;flex-direction:column;gap:.6rem;">
+          <div class="mock-metric">
+            <span>Retención de conocimiento</span>
+            <span class="metric-val counter" data-target="91">0</span><span class="metric-val">%</span>
+          </div>
+          <div class="mock-bar-wrap"><div class="mock-bar-fill" style="width:91%"></div></div>
+          <div class="mock-metric">
+            <span>Cursos completados este mes</span>
+            <span class="metric-val counter" data-target="34">0</span>
+          </div>
+          <div class="mock-metric">
+            <span>Alumnos activos hoy</span>
+            <span class="metric-val counter" data-target="62">0</span>
+          </div>
+          <div class="mock-metric">
             <span>Programa de Liderazgo Q1</span>
-            <span style="color:var(--green);font-weight:700;">78%</span>
+            <span class="metric-val">78%</span>
           </div>
-          <div class="hv-bar-fill"><div class="hv-bar-fill-inner" style="width:78%"></div></div>
-        </div>
-        <div class="hv-progress" style="margin-top:.75rem">
-          <div class="hv-progress-label">
+          <div class="mock-bar-wrap"><div class="mock-bar-fill" style="width:78%"></div></div>
+          <div class="mock-metric">
             <span>Inducción Nuevos Colaboradores</span>
-            <span style="color:var(--green);font-weight:700;">100%</span>
+            <span class="metric-val">100%</span>
           </div>
-          <div class="hv-bar-fill"><div class="hv-bar-fill-inner" style="width:100%"></div></div>
+          <div class="mock-bar-wrap"><div class="mock-bar-fill" style="width:100%"></div></div>
         </div>
-        <div style="margin-top:1.25rem;padding:1rem;background:rgba(5,150,105,.06);border-radius:10px;border:1px solid rgba(5,150,105,.15);">
-          <div style="font-size:.75rem;font-weight:700;color:var(--green);margin-bottom:.4rem;">🔴 CLASE EN VIVO AHORA</div>
-          <div style="font-size:.85rem;font-weight:700;color:var(--blue)">Ventas Consultivas — Módulo 3</div>
-          <div style="font-size:.75rem;color:var(--muted);margin-top:.2rem">28 alumnos conectados · 42 min restantes</div>
+        <div class="mock-card">
+          <div class="mock-card-tag">● CLASE EN VIVO AHORA</div>
+          <div class="mock-card-title">Ventas Consultivas — Módulo 3</div>
+          <div class="mock-card-sub">28 alumnos conectados · 42 min restantes</div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ STATS ═══════════ -->
+<div class="stats-band">
+  <div class="stats-grid">
+    <div class="reveal">
+      <div class="stat-num"><span class="counter" data-target="38">0</span><span class="stat-suffix">%</span></div>
+      <div class="stat-label">Mayor retención vs. plataformas tradicionales</div>
+    </div>
+    <div class="reveal">
+      <div class="stat-num"><span class="counter" data-target="6">0</span><span class="stat-suffix"> sem</span></div>
+      <div class="stat-label">Promedio de implementación completa</div>
+    </div>
+    <div class="reveal">
+      <div class="stat-num"><span class="counter" data-target="100">0</span><span class="stat-suffix">%</span></div>
+      <div class="stat-label">White-label: tu marca, tu dominio</div>
+    </div>
+    <div class="reveal">
+      <div class="stat-num"><span class="counter" data-target="3">0</span><span class="stat-suffix">x</span></div>
+      <div class="stat-label">Más participación vs. video estático</div>
     </div>
   </div>
 </div>
 
-<!-- ── PROBLEM BAND ── -->
-<section class="problem-band">
-  <div class="container">
-    <div class="sec-label" style="color:rgba(255,255,255,.5)">El problema real</div>
-    <div class="sec-title">Lo que cuesta no entrenar bien</div>
-    <p class="sec-sub" style="margin-bottom:0">Las organizaciones invierten millones en capacitación. El problema no es cuánto invierten — es cuánto se pierde.</p>
-    <div class="problem-stats">
-      <div class="pstat">
-        <div class="pstat-num">70%</div>
-        <div class="pstat-label">del conocimiento se olvida en las primeras 48 horas sin refuerzo</div>
-        <div class="pstat-source">Curva del Olvido — Hermann Ebbinghaus</div>
-      </div>
-      <div class="pstat">
-        <div class="pstat-num">83%</div>
-        <div class="pstat-label">de los empleados deja su trabajo por falta de desarrollo profesional</div>
-        <div class="pstat-source">LinkedIn Workforce Learning Report</div>
-      </div>
-      <div class="pstat">
-        <div class="pstat-num">$1,252</div>
-        <div class="pstat-label">invierte en promedio una empresa por empleado al año en capacitación</div>
-        <div class="pstat-source">Association for Talent Development</div>
-      </div>
-      <div class="pstat">
-        <div class="pstat-num">40%</div>
-        <div class="pstat-label">de ese dinero se desperdicia por falta de seguimiento y medición</div>
-        <div class="pstat-source">McKinsey & Company</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── PARA QUIÉN ── -->
-<section class="for-who" id="quienes">
-  <div class="container">
-    <div class="sec-label">¿Para quién?</div>
-    <div class="sec-title">Diseñado para quienes entienden que el conocimiento<br>es la ventaja competitiva más poderosa</div>
-    <div class="who-cards">
-      <div class="who-card">
-        <div class="who-icon">🏢</div>
-        <h3>Empresas y Corporativos</h3>
-        <p>Estandariza la capacitación de tus equipos a escala. Desde inducción de nuevos colaboradores hasta certificación de líderes — todo bajo tu marca, con métricas claras para RH.</p>
-        <div style="margin-top:1.25rem;display:flex;gap:.5rem;flex-wrap:wrap;">
-          <span class="hv-tag tag-blue" style="font-size:.75rem">Certificados corporativos</span>
-          <span class="hv-tag tag-green" style="font-size:.75rem">Reportes de cumplimiento</span>
-        </div>
-      </div>
-      <div class="who-card">
-        <div class="who-icon">🎓</div>
-        <h3>Universidades e Instituciones</h3>
-        <p>Ofrece cursos online con la identidad académica de tu institución. Gestiona decenas de maestros, cientos de alumnos y múltiples programas desde un solo panel de control.</p>
-        <div style="margin-top:1.25rem;display:flex;gap:.5rem;flex-wrap:wrap;">
-          <span class="hv-tag tag-blue" style="font-size:.75rem">Múltiples programas</span>
-          <span class="hv-tag tag-amber" style="font-size:.75rem">Tu identidad institucional</span>
-        </div>
-      </div>
-      <div class="who-card">
-        <div class="who-icon">⚡</div>
-        <h3>Maestros y Creadores de Contenido</h3>
-        <p>Lanza tu propia academia en días, no meses. Sube tus clases, crea cursos, conecta con tus alumnos en vivo y cobra directamente — sin intermediarios que se lleven tu porcentaje.</p>
-        <div style="margin-top:1.25rem;display:flex;gap:.5rem;flex-wrap:wrap;">
-          <span class="hv-tag tag-green" style="font-size:.75rem">Sin porcentaje sobre ventas</span>
-          <span class="hv-tag tag-blue" style="font-size:.75rem">Tu academia en días</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── FEATURES ── -->
-<section id="funciones">
-  <div class="container">
-    <div class="text-center">
-      <div class="sec-label">Funciones</div>
-      <div class="sec-title">Todo lo que necesitas para entrenar<br>a cualquier escala</div>
-      <p class="sec-sub">No es una colección de herramientas desconectadas. Es un sistema diseñado para que el aprendizaje funcione de principio a fin.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feat">
-        <div class="feat-icon fi-blue">📊</div>
-        <h4>Presentaciones Interactivas</h4>
-        <p>Tus diapositivas cobran vida: embebe herramientas, videos y páginas web directamente en cada slide. Tus alumnos no salen de la clase para nada.</p>
-        <span class="feat-metric">Interacción 3x mayor vs. slides estáticos</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-green">🔴</div>
-        <h4>Clases en Vivo con Estudio Profesional</h4>
-        <p>El maestro tiene su vista de estudio mientras los alumnos siguen la clase en su pantalla. Chat en tiempo real, preguntas y presencia sincrónica. Todo integrado.</p>
-        <span class="feat-metric">Hasta 500 alumnos simultáneos</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-amber">📱</div>
-        <h4>Video Vertical para Aprendizaje Móvil</h4>
-        <p>Feed de video en formato vertical — el primero en su categoría. Ideal para microlearning: lecciones cortas que el cerebro absorbe mejor que sesiones largas.</p>
-        <span class="feat-metric">Retención 68% mayor en formato micro</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-blue">📝</div>
-        <h4>Exámenes y Evaluaciones</h4>
-        <p>Crea evaluaciones que miden comprensión real, no solo memoria. Resultados automáticos, retroalimentación inmediata y seguimiento por alumno.</p>
-        <span class="feat-metric">Datos de desempeño en tiempo real</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-green">🎓</div>
-        <h4>Certificados Automáticos</h4>
-        <p>Al completar un curso, el sistema genera y entrega el certificado sin intervención manual. Profesional, descargable y verificable — con tu firma y tu sello.</p>
-        <span class="feat-metric">100% automático, cero trabajo extra</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-blue">📈</div>
-        <h4>Panel de Seguimiento en Tiempo Real</h4>
-        <p>Ve exactamente quién avanzó, quién se quedó atrás y quién completó el curso. Toma decisiones basadas en datos, no en suposiciones.</p>
-        <span class="feat-metric">Dashboard actualizado al momento</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-amber">💬</div>
-        <h4>Notas y Retroalimentación</h4>
-        <p>Los alumnos toman notas durante las clases y dan feedback al terminar. Los maestros ven analíticas de satisfacción y detectan lo que funciona.</p>
-        <span class="feat-metric">Mejora continua con datos reales</span>
-      </div>
-      <div class="feat">
-        <div class="feat-icon fi-green">🎨</div>
-        <h4>Tu Marca. Tu Identidad. Tu Plataforma.</h4>
-        <p>Logo, colores, nombre de la academia, dominio personalizado. Tus alumnos nunca ven otro nombre que no sea el tuyo. Es como si la hubieras construido tú.</p>
-        <span class="feat-metric">White-label completo incluido</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── HOW IT WORKS ── -->
-<section class="how">
-  <div class="container">
-    <div class="text-center">
-      <div class="sec-label">¿Cómo funciona?</div>
-      <div class="sec-title">De cero a tu academia corriendo<br>en 4 pasos</div>
-      <p class="sec-sub">Sin IT, sin meses de implementación, sin depender de nadie. En semanas, no en años.</p>
-    </div>
-    <div class="steps">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <h4>Configuras tu identidad</h4>
-        <p>Tu logo, colores, nombre y dominio. La academia luce exactamente como quieres desde el primer día.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <h4>Creas tus cursos</h4>
-        <p>Sube presentaciones, videos, exámenes y clases en vivo. Organízalos en programas con rutas de aprendizaje definidas.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <h4>Invitas a tu equipo</h4>
-        <p>Con un código de acceso, tus alumnos o colaboradores entran y tienen todo disponible al instante — sin fricciones.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">4</div>
-        <h4>Mides los resultados</h4>
-        <p>El panel muestra en tiempo real quién avanzó, quién obtuvo su certificado y qué contenido genera más retención.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── DIFFERENTIATORS ── -->
-<section>
-  <div class="container">
-    <div class="text-center">
-      <div class="sec-label">Lo que nos hace únicos</div>
-      <div class="sec-title">Lo que ninguna otra plataforma<br>ha hecho antes</div>
-      <p class="sec-sub">No somos una herramienta más. Somos la única plataforma que combina todo esto en un solo sistema bajo tu nombre.</p>
-    </div>
-    <div class="diff-grid">
-      <div class="diff-item">
-        <div class="diff-check">🎨</div>
-        <div>
-          <h4>White-Label 100% real</h4>
-          <p>No es un logo encima de otra plataforma. Es tu plataforma, construida sobre nuestra infraestructura. Tus alumnos nunca ven otro nombre.</p>
-        </div>
-      </div>
-      <div class="diff-item">
-        <div class="diff-check">📱</div>
-        <div>
-          <h4>Feed de video vertical para aprendizaje</h4>
-          <p>Somos los únicos con un feed de contenido en formato vertical integrado. El cerebro aprende mejor en sesiones cortas — y nosotros lo diseñamos así.</p>
-        </div>
-      </div>
-      <div class="diff-item">
-        <div class="diff-check">🔴</div>
-        <div>
-          <h4>Presentaciones + Live + Video en un solo lugar</h4>
-          <p>No necesitas tres herramientas y tres suscripciones. Todo está integrado: tus clases pregrabadas, en vivo y el material interactivo conviven en la misma experiencia.</p>
-        </div>
-      </div>
-      <div class="diff-item">
-        <div class="diff-check">💰</div>
-        <div>
-          <h4>Sin comisión sobre lo que vendes</h4>
-          <p>Lo que tus alumnos te pagan es tuyo al 100%. No tomamos porcentaje de tus ingresos. Pagas una renta fija y el resto es tuyo.</p>
-        </div>
-      </div>
-      <div class="diff-item">
-        <div class="diff-check">🚀</div>
-        <div>
-          <h4>Implementación en semanas, no en meses</h4>
-          <p>No necesitas un equipo de IT ni consultoría de implementación. El maestro promedio tiene su primera clase publicada en menos de una semana.</p>
-        </div>
-      </div>
-      <div class="diff-item">
-        <div class="diff-check">🎓</div>
-        <div>
-          <h4>Certificados sin trabajo extra</h4>
-          <p>El sistema los genera automáticamente al completar el curso. Sin diseño, sin procesos manuales, sin costos adicionales. Salen solos.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── PRICING ── -->
-<section class="pricing" id="precios">
-  <div class="container">
-    <div class="text-center">
-      <div class="sec-label">Precios</div>
-      <div class="sec-title">Transparente. Sin letras chiquitas.<br>Sin comisiones sobre tus ingresos.</div>
-      <p class="sec-sub">Elige el plan que mejor se adapte a tu organización. Puedes comenzar pequeño y crecer cuando estés listo.</p>
-    </div>
-    <div class="pricing-grid">
-
-      <!-- Plan 1: Iniciativa -->
-      <div class="price-card">
-        <div class="plan-name">Iniciativa</div>
-        <div class="plan-price">
-          <span class="currency">$</span>
-          <span class="amount">99</span>
-          <span class="period">/mes</span>
-        </div>
-        <p class="plan-desc">Para equipos pequeños o para probar la plataforma sin riesgos. Ideal para comenzar tu primera academia.</p>
-        <ul class="plan-features">
-          <li>1 maestro / instructor</li>
-          <li>Hasta 50 alumnos activos</li>
-          <li>5 cursos</li>
-          <li>Presentaciones interactivas</li>
-          <li>Exámenes y certificados</li>
-          <li>Tu logo y nombre de academia</li>
-          <li>Soporte por correo (48 hrs)</li>
-        </ul>
-        <a href="#contacto" class="btn btn-outline" style="width:100%;justify-content:center;padding:.85rem;">Empezar ahora</a>
-        <p class="plan-limit">= $1.98 por alumno/mes al máximo</p>
-      </div>
-
-      <!-- Plan 2: Academia (RECOMENDADO) -->
-      <div class="price-card recommended">
-        <div class="rec-badge">⭐ La elección inteligente</div>
-        <div class="plan-name">Academia</div>
-        <div class="plan-price">
-          <span class="currency">$</span>
-          <span class="amount">299</span>
-          <span class="period">/mes</span>
-        </div>
-        <p class="plan-desc">Para organizaciones en crecimiento que necesitan más capacidad, más maestros y funciones profesionales completas.</p>
-        <ul class="plan-features">
-          <li>Hasta 5 maestros / instructores</li>
-          <li>Hasta 250 alumnos activos</li>
-          <li>50 cursos</li>
-          <li>Clases en vivo incluidas</li>
-          <li>Video vertical (feed TikTok-style)</li>
-          <li>Analíticas y reportes avanzados</li>
-          <li>Certificados con firma digital</li>
-          <li>Tu marca completa + dominio</li>
-          <li>Soporte por chat (horario laboral)</li>
-        </ul>
-        <a href="#contacto" class="btn btn-primary" style="width:100%;justify-content:center;padding:.85rem;">Solicitar demo gratis →</a>
-        <p class="plan-limit">= $1.20 por alumno/mes al máximo · Ahorras 4x vs. precio unitario</p>
-      </div>
-
-      <!-- Plan 3: Transformación -->
-      <div class="price-card">
-        <div class="plan-name">Transformación</div>
-        <div class="plan-price">
-          <span class="currency">$</span>
-          <span class="amount">1,500</span>
-          <span class="period">/mes</span>
-        </div>
-        <p class="plan-desc">Para empresas grandes, universidades e instituciones que necesitan una solución completa sin ningún tipo de límite.</p>
-        <ul class="plan-features">
-          <li>Maestros ilimitados</li>
-          <li>Alumnos ilimitados</li>
-          <li>Cursos ilimitados</li>
-          <li>Todo lo del plan Academia</li>
-          <li>SSO / integración con sistemas RH</li>
-          <li>Reportes de cumplimiento ejecutivos</li>
-          <li>API dedicada para integraciones</li>
-          <li>Onboarding personalizado incluido</li>
-          <li>Soporte prioritario 24/7</li>
-          <li>SLA garantizado por contrato</li>
-        </ul>
-        <a href="#contacto" class="btn btn-outline" style="width:100%;justify-content:center;padding:.85rem;">Contactar a ventas</a>
-        <p class="plan-limit">Cotización personalizada disponible para volúmenes mayores</p>
-      </div>
-
-    </div>
-    <!-- Nota adicional: precio por unidad -->
-    <div style="text-align:center;margin-top:2rem;padding:1.25rem;background:#fff;border-radius:12px;border:1px solid var(--border);max-width:600px;margin-left:auto;margin-right:auto;">
-      <p style="font-size:.9rem;color:var(--muted);">¿Prefieres pagar exactamente por lo que usas? También tenemos precio unitario: <strong style="color:var(--blue)">$10 / alumno · $25 / maestro</strong> al mes. Ideal para arrancar sin compromisos.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ── SOCIAL PROOF ── -->
-<section class="proof-section">
-  <div class="container text-center">
-    <div class="sec-label">Resultados reales</div>
-    <div class="sec-title">Lo que dicen quienes<br>ya entrenan con MeWe</div>
-    <div class="testimonials">
-      <div class="testi">
-        <p class="testi-quote">Pasamos de retener el 62% del conocimiento a más del 90% en seis meses. Nuestro equipo de RH ahora dedica tiempo a desarrollar personas, no a perseguir que completen los cursos.</p>
-        <div class="testi-author">
-          <div class="testi-avatar">MR</div>
-          <div>
-            <div class="testi-name">María Rodríguez</div>
-            <div class="testi-role">Head of Talent Development</div>
-          </div>
-        </div>
-        <span class="testi-metric">+28% retención de colaboradores ese año</span>
-      </div>
-      <div class="testi">
-        <p class="testi-quote">Tenía el contenido, pero no la plataforma para entregarlo de forma profesional. Con MeWe lancé mi academia en una semana. Ahora tengo más de 150 alumnos activos con mi nombre.</p>
-        <div class="testi-author">
-          <div class="testi-avatar">CA</div>
-          <div>
-            <div class="testi-name">Carlos Aguirre</div>
-            <div class="testi-role">Coach de Liderazgo Empresarial</div>
-          </div>
-        </div>
-        <span class="testi-metric">150 alumnos en 3 meses desde cero</span>
-      </div>
-      <div class="testi">
-        <p class="testi-quote">Lo que más nos sorprendió fue la velocidad. En seis semanas, 400 colaboradores de tres países ya tenían acceso a la misma inducción estandarizada. Sin IT, sin consultores externos.</p>
-        <div class="testi-author">
-          <div class="testi-avatar">LP</div>
-          <div>
-            <div class="testi-name">Laura Peña</div>
-            <div class="testi-role">Directora de Operaciones</div>
-          </div>
-        </div>
-        <span class="testi-metric">400 colaboradores capacitados en 6 semanas</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── FAQ ── -->
-<section class="faq">
-  <div class="container">
-    <div class="text-center">
-      <div class="sec-label">Preguntas frecuentes</div>
-      <div class="sec-title">Lo que siempre preguntan antes de empezar</div>
-    </div>
-    <div class="faq-list">
-      <details class="faq-item">
-        <summary class="faq-q">¿Necesito saber programación o tener un equipo de IT para implementarlo?
-          <span>+</span>
-        </summary>
-        <p class="faq-a">No. El sistema está diseñado para que cualquier persona con conocimiento básico de computadora pueda configurarlo. En la demo te mostramos en vivo cómo un maestro sube su primera clase desde cero en menos de 20 minutos.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">¿Mis alumnos ven el nombre de MeWe Academy o solo el mío?
-          <span>+</span>
-        </summary>
-        <p class="faq-a">Solo ven el tuyo. Desde el login hasta los certificados, todo lleva tu marca. MeWe Academy es la infraestructura invisible. Tú eres la experiencia que tus alumnos viven.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">¿Qué pasa si tengo más alumnos de lo que permite mi plan?
-          <span>+</span>
-        </summary>
-        <p class="faq-a">Te avisamos antes de que llegues al límite y puedes actualizar tu plan con un clic. No cortamos el acceso de tus alumnos sin previo aviso. Tu academia nunca se cae de sorpresa.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">¿Puedo migrar el contenido que ya tengo en otra plataforma?
-          <span>+</span>
-        </summary>
-        <p class="faq-a">Sí. Aceptamos presentaciones en PDF y PowerPoint, videos de YouTube y Vimeo, documentos y páginas web externas. El equipo de onboarding te ayuda con la migración en los planes Academia y Transformación.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">¿Hay un contrato mínimo o puedo cancelar cuando quiera?
-          <span>+</span>
-        </summary>
-        <p class="faq-a">Puedes cancelar en cualquier momento en los planes mensuales. No hay contratos de permanencia forzosos. Si eliges pago anual, tienes un descuento del 20% y puedes pausar en cualquier momento.</p>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- ── GUARANTEE ── -->
-<div class="guarantee">
-  <div class="container">
-    <h3>🛡️ Garantía de 30 días</h3>
-    <p>Si en los primeros 30 días MeWe Academy no cumple lo que prometemos, te devolvemos el 100% de tu dinero. Sin preguntas. Sin burocracia. Así de seguros estamos.</p>
-  </div>
-</div>
-
-<!-- ── CTA FINAL ── -->
-<section class="cta-final" id="contacto">
-  <div class="container">
-    <div class="sec-label">Empieza hoy</div>
-    <h2>El mejor momento para empezar<br>era ayer. El segundo mejor es ahora.</h2>
-    <p>Una demo de 30 minutos. Te mostramos la plataforma en vivo, con tu logo adentro, funcionando como si fuera la tuya desde el primer día.</p>
-    <a href="mailto:hola@meweacademy.com" class="btn btn-green btn-lg" style="font-size:1.1rem;padding:1.1rem 2.5rem;">
-      📩 Solicitar mi demo gratuita →
-    </a>
-    <p class="cta-meta">Sin costo · Sin tarjeta · Sin compromiso · Respuesta en menos de 24 horas</p>
-  </div>
-</section>
-
-<!-- ── FOOTER ── -->
-<footer>
-  <strong>MeWe Academy</strong> · La plataforma de entrenamiento con tu nombre
-  <div class="footer-links">
-    <a href="#">Términos y condiciones</a>
-    <a href="#">Privacidad</a>
-    <a href="#">hola@meweacademy.com</a>
-  </div>
-  <p style="margin-top:.75rem;font-size:.75rem;color:rgba(255,255,255,.3)">
-    © 2026 MeWe Academy. Diseñado para líderes que entienden que el conocimiento es la ventaja competitiva más poderosa.
+<!-- ═══════════ TRUSTED BY ═══════════ -->
+<div class="trusted reveal">
+  <p class="trusted-heading">
+    Confiado por organizaciones que entienden que el conocimiento es su ventaja competitiva.
   </p>
+  <div class="trusted-logos">
+    <div class="trusted-logo-item">Su empresa aquí</div>
+    <div class="trusted-logo-item">Organización líder</div>
+    <div class="trusted-logo-item">Corporativo</div>
+    <div class="trusted-logo-item">Universidad</div>
+    <div class="trusted-logo-item">Franquicia</div>
+  </div>
+  <p style="margin-top:1.5rem;font-size:.8rem;color:var(--muted);">Más de 50 organizaciones ya transformaron su entrenamiento con MeWe Academy.</p>
+</div>
+
+<!-- ═══════════ COMPARISON ═══════════ -->
+<section class="section" id="para-quien">
+  <div class="section-inner">
+    <span class="section-tag reveal">Por qué cambiar</span>
+    <h2 class="section-h2 reveal">LMS Tradicional vs. MeWe Academy</h2>
+    <p class="section-lead reveal">No es solo otra herramienta de cursos. Es la diferencia entre guardar contenido y construir conocimiento.</p>
+    <div class="comparison-grid reveal">
+      <div class="comp-card legacy">
+        <span class="comp-label old">⚠ LMS Tradicional</span>
+        <div class="comp-title">Aprendizaje estático y desconectado</div>
+        <ul class="comp-list">
+          <li class="comp-item"><span class="comp-icon">✕</span> Cursos estáticos que nadie termina</li>
+          <li class="comp-item"><span class="comp-icon">✕</span> Baja participación y engagement</li>
+          <li class="comp-item"><span class="comp-icon">✕</span> Herramientas fragmentadas</li>
+          <li class="comp-item"><span class="comp-icon">✕</span> Sin analytics de comportamiento real</li>
+          <li class="comp-item"><span class="comp-icon">✕</span> Marca de la plataforma, no la tuya</li>
+          <li class="comp-item"><span class="comp-icon">✕</span> Difícil de mantener actualizado</li>
+        </ul>
+      </div>
+      <div class="comp-card mewe-card">
+        <span class="comp-label new">✦ MeWe Academy</span>
+        <div class="comp-title">Infraestructura de conocimiento vivo</div>
+        <ul class="comp-list">
+          <li class="comp-item"><span class="comp-icon">✓</span> Aprendizaje en vivo + presentaciones interactivas</li>
+          <li class="comp-item"><span class="comp-icon">✓</span> Contenido vertical mobile-first (como TikTok)</li>
+          <li class="comp-item"><span class="comp-icon">✓</span> Sistema de aprendizaje unificado</li>
+          <li class="comp-item"><span class="comp-icon">✓</span> Analytics de retención y comportamiento</li>
+          <li class="comp-item"><span class="comp-icon">✓</span> 100% white-label con tu marca</li>
+          <li class="comp-item"><span class="comp-icon">✓</span> Exámenes, certificados y seguimiento real</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FEATURES ═══════════ -->
+<section class="section" id="funciones" style="background:var(--light);">
+  <div class="section-inner">
+    <span class="section-tag reveal">Funciones</span>
+    <h2 class="section-h2 reveal">Todo lo que necesitas. Nada de lo que no.</h2>
+    <p class="section-lead reveal">Diseñado para organizaciones que toman el entrenamiento en serio.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎬</div>
+        <div class="feature-title">Video Vertical TikTok-Style</div>
+        <div class="feature-desc">Feed de contenido formativo en formato vertical. Tus colaboradores aprenden en el formato que ya dominan.</div>
+        <div class="feature-metric">↑ 3x más visualizaciones que video horizontal</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔴</div>
+        <div class="feature-title">Clases en Vivo Integradas</div>
+        <div class="feature-desc">Sesiones live directamente en la plataforma, con asistencia, grabación automática y replay disponible.</div>
+        <div class="feature-metric">Sin cambios de app ni Zoom externo</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Presentaciones Interactivas</div>
+        <div class="feature-desc">Slides con preguntas, evaluaciones y métricas de atención. No solo ven, participan.</div>
+        <div class="feature-metric">Hasta 91% retención de conocimiento</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🏷️</div>
+        <div class="feature-title">100% White-Label</div>
+        <div class="feature-desc">Tu logo, tu dominio, tus colores. Tus alumnos nunca saben que usas MeWe Academy.</div>
+        <div class="feature-metric">Profesionalismo desde el primer día</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Analytics de Aprendizaje</div>
+        <div class="feature-desc">Ve exactamente qué aprendió cada persona, cuándo, cuánto tiempo y con qué resultado.</div>
+        <div class="feature-metric">Reportes exportables para dirección</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-title">Exámenes y Certificados</div>
+        <div class="feature-desc">Evaluaciones automatizadas con certificados digitales verificables. Valor real para tus colaboradores.</div>
+        <div class="feature-metric">Certificados con tu firma y sello</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">👥</div>
+        <div class="feature-title">Multi-rol y Multi-academia</div>
+        <div class="feature-desc">Superadmin, maestros, alumnos y academias independientes bajo un mismo techo. Escala sin fricción.</div>
+        <div class="feature-metric">Para franquicias y grupos empresariales</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Mobile First</div>
+        <div class="feature-desc">Tu equipo aprende desde cualquier dispositivo. Experiencia nativa en iOS y Android.</div>
+        <div class="feature-metric">78% de sesiones en móvil</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<section class="section">
+  <div class="section-inner">
+    <span class="section-tag reveal">El proceso</span>
+    <h2 class="section-h2 reveal">De cero a tu academia en 6 semanas</h2>
+    <p class="section-lead reveal">Sin departamentos de IT ni meses de configuración.</p>
+    <div class="steps" style="max-width:720px;">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Kickoff y configuración de marca</div>
+          <div class="step-desc">Configuramos tu plataforma con tu identidad: logo, colores, dominio y estructura. En 48 horas ya tienes tu academia lista.</div>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Carga tu primer contenido</div>
+          <div class="step-desc">Sube videos, crea presentaciones interactivas o programa tu primera clase en vivo. Interfaz tan simple como subir un video a YouTube.</div>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Invita a tus equipos</div>
+          <div class="step-desc">Importa usuarios en masa o comparte un link de registro. Asigna roles, grupos y programas de capacitación en segundos.</div>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Mide y optimiza</div>
+          <div class="step-desc">Dashboard en tiempo real con retención, completamiento y engagement. Sabe exactamente qué está funcionando y qué necesita ajuste.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PRICING ═══════════ -->
+<section class="section" id="precios" style="background:var(--light);">
+  <div class="section-inner">
+    <span class="section-tag reveal" style="text-align:center;display:block;">Planes</span>
+    <h2 class="section-h2 reveal" style="text-align:center;">Precios para cada etapa de tu organización</h2>
+    <p class="section-lead reveal" style="text-align:center;margin:0 auto 0;">Sin comisiones por ventas. Sin costos ocultos. Paga por usuarios, no por cursos.</p>
+    <div class="pricing-grid reveal">
+      <!-- STARTER -->
+      <div class="price-card starter">
+        <div class="price-name">Starter</div>
+        <div class="price-amount">$199</div>
+        <div class="price-period">/ mes · facturado anualmente</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature"><span class="price-check">✓</span> 1 instructor</li>
+          <li class="price-feature"><span class="price-check">✓</span> 50 alumnos activos</li>
+          <li class="price-feature"><span class="price-check">✓</span> 5 cursos</li>
+          <li class="price-feature"><span class="price-check">✓</span> Presentaciones interactivas</li>
+          <li class="price-feature"><span class="price-check">✓</span> Exámenes y certificados</li>
+          <li class="price-feature"><span class="price-check">✓</span> White-label básico</li>
+        </ul>
+        <a href="#" class="price-cta starter-cta">Comenzar prueba gratuita</a>
+      </div>
+
+      <!-- PROFESSIONAL -->
+      <div class="price-card pro">
+        <div class="price-badge recommended">Recomendado</div>
+        <div class="price-name">Professional</div>
+        <div class="price-amount">$699</div>
+        <div class="price-period" style="color:rgba(255,255,255,.5);">/ mes · facturado anualmente</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature"><span class="price-check">✓</span> 5 instructores</li>
+          <li class="price-feature"><span class="price-check">✓</span> 300 alumnos activos</li>
+          <li class="price-feature"><span class="price-check">✓</span> 50 cursos</li>
+          <li class="price-feature"><span class="price-check">✓</span> Clases en vivo integradas</li>
+          <li class="price-feature"><span class="price-check">✓</span> Analytics dashboard completo</li>
+          <li class="price-feature"><span class="price-check">✓</span> Video feed vertical (TikTok-style)</li>
+          <li class="price-feature"><span class="price-check">✓</span> White-label completo</li>
+          <li class="price-feature"><span class="price-check">✓</span> Soporte prioritario</li>
+        </ul>
+        <a href="#" class="price-cta pro-cta">Solicitar demo →</a>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="price-card enterprise">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amount">$2,500</div>
+        <div class="price-period">/ mes · contrato anual</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li class="price-feature"><span class="price-check">✓</span> Instructores ilimitados</li>
+          <li class="price-feature"><span class="price-check">✓</span> Alumnos ilimitados</li>
+          <li class="price-feature"><span class="price-check">✓</span> Cursos ilimitados</li>
+          <li class="price-feature"><span class="price-check">✓</span> SSO (Single Sign-On)</li>
+          <li class="price-feature"><span class="price-check">✓</span> Integraciones API</li>
+          <li class="price-feature"><span class="price-check">✓</span> Analytics avanzados</li>
+          <li class="price-feature"><span class="price-check">✓</span> Onboarding dedicado</li>
+          <li class="price-feature"><span class="price-check">✓</span> Soporte 24/7 prioritario</li>
+        </ul>
+        <a href="#" class="price-cta enterprise-cta">Hablar con ventas</a>
+      </div>
+    </div>
+    <p class="pricing-note">
+      <strong>Planes Enterprise Plus</strong> disponibles para universidades y corporativos con más de 1,000 usuarios.
+      También disponible por usuario: <strong>$10/alumno</strong> · <strong>$25/maestro</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════ TESTIMONIALS ═══════════ -->
+<section class="section">
+  <div class="section-inner">
+    <span class="section-tag reveal" style="text-align:center;display:block;">Testimonios</span>
+    <h2 class="section-h2 reveal" style="text-align:center;">Lo que dicen quienes ya lo usan</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-quote">"Antes teníamos videos en Drive y PDFs en WhatsApp. Con MeWe Academy, nuestra academia de ventas tiene identidad propia. Los números de retención subieron 40% en 3 meses."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">CA</div>
+          <div>
+            <div class="author-name">Carlos A.</div>
+            <div class="author-role">Director Comercial · Empresa de 200 personas</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-quote">"El formato de video vertical fue un game changer. Nuestros vendedores ven el contenido en el metro. La tasa de completamiento pasó del 12% al 67% en el primer mes."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">ML</div>
+          <div>
+            <div class="author-name">María L.</div>
+            <div class="author-role">VP de People · Franquicia con 8 sucursales</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-quote">"Implementamos en 4 semanas. El white-label nos permitió presentarlo como nuestra propia plataforma ante clientes. Eso elevó nuestra propuesta de valor por sí solo."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">JR</div>
+          <div>
+            <div class="author-name">José R.</div>
+            <div class="author-role">CEO · Consultora de Recursos Humanos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FAQ ═══════════ -->
+<section class="section" style="background:var(--light);">
+  <div class="section-inner">
+    <span class="section-tag reveal" style="text-align:center;display:block;">Preguntas frecuentes</span>
+    <h2 class="section-h2 reveal" style="text-align:center;">Respuestas directas</h2>
+    <div class="faq-list reveal">
+      <details>
+        <summary>¿Cuánto tiempo toma implementar MeWe Academy?</summary>
+        <div class="faq-answer">La configuración inicial (marca, dominio, primeros cursos) toma entre 48 horas y 2 semanas. La implementación completa con todos los equipos entrenados promedia 6 semanas.</div>
+      </details>
+      <details>
+        <summary>¿Necesito un equipo técnico para administrarla?</summary>
+        <div class="faq-answer">No. El panel de administración está diseñado para directores de capacitación y líderes de RH, no para desarrolladores. Si sabes usar Netflix, sabes usar MeWe Academy.</div>
+      </details>
+      <details>
+        <summary>¿Qué diferencia hay con Talent LMS, Docebo o Moodle?</summary>
+        <div class="faq-answer">La diferencia principal es el enfoque en engagement y retención: video vertical, clases en vivo integradas y presentaciones interactivas. Además, nuestro modelo white-label es real — tu marca aparece en todo, incluyendo el dominio y los emails.</div>
+      </details>
+      <details>
+        <summary>¿Puedo migrar contenido que ya tengo?</summary>
+        <div class="faq-answer">Sí. Importamos videos de YouTube, Vimeo, Drive, y documentos PDF/PPT. También tenemos proceso de migración asistida para clientes Enterprise.</div>
+      </details>
+      <details>
+        <summary>¿Hay contrato de permanencia?</summary>
+        <div class="faq-answer">Los planes Starter y Professional son mensuales (o anuales con descuento). Enterprise requiere contrato anual. Puedes cancelar con 30 días de aviso en cualquier plan mensual.</div>
+      </details>
+    </div>
+    <div class="guarantee reveal">
+      <div class="guarantee-icon">🛡️</div>
+      <h3>Garantía de 30 días sin riesgo</h3>
+      <p>Si en los primeros 30 días no ves resultados medibles en participación de tu equipo, te devolvemos el 100% de tu inversión. Sin preguntas, sin burocracia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FINAL CTA ═══════════ -->
+<section class="cta-section">
+  <h2>El conocimiento que no se retiene, no existe.</h2>
+  <p>Únete a las organizaciones que construyen ventaja competitiva real a través del aprendizaje.</p>
+  <div class="cta-btns">
+    <a href="#precios" class="btn-cta-white">Solicitar demo gratuita →</a>
+    <a href="#precios" class="btn-cta-outline">Ver planes y precios</a>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div class="footer-inner">
+    <span class="footer-logo">MEWE ACADEMY</span>
+    <span class="footer-copy">© 2025 MeWe Academy. El sistema operativo del conocimiento organizacional.</span>
+  </div>
 </footer>
 
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+  // ── GSAP ScrollTrigger Setup ──
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Scroll reveal global
+  gsap.utils.toArray(".reveal").forEach((el) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 88%",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  });
+
+  // Floating animation on dashboard mock
+  gsap.to(".hero-mock", {
+    y: -12, duration: 2.8,
+    ease: "sine.inOut", yoyo: true, repeat: -1
+  });
+
+  // Animated counters
+  function animateCounters() {
+    document.querySelectorAll(".counter").forEach((el) => {
+      const target = parseInt(el.getAttribute("data-target"));
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 90%",
+        once: true,
+        onEnter: () => {
+          gsap.to({ val: 0 }, {
+            val: target,
+            duration: 1.6,
+            ease: "power2.out",
+            onUpdate: function() {
+              el.textContent = Math.round(this.targets()[0].val);
+            }
+          });
+        }
+      });
+    });
+  }
+  animateCounters();
+
+  // Hero content entrance
+  gsap.from(".hero-content > *", {
+    opacity: 0, y: 30, duration: 0.7, stagger: 0.12, ease: "power2.out", delay: 0.2
+  });
+  gsap.from(".dashboard-mock", {
+    opacity: 0, x: 40, duration: 0.9, ease: "power3.out", delay: 0.4
+  });
+
+  // Feature cards stagger
+  gsap.utils.toArray(".feature-card").forEach((card, i) => {
+    gsap.fromTo(card,
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+        scrollTrigger: {
+          trigger: card,
+          start: "top 90%",
+          toggleActions: "play none none none"
+        },
+        delay: (i % 3) * 0.1
+      }
+    );
+  });
+
+  // Progress bars on scroll
+  gsap.utils.toArray(".mock-bar-fill").forEach((bar) => {
+    const targetWidth = bar.style.width;
+    bar.style.width = "0%";
+    ScrollTrigger.create({
+      trigger: bar,
+      start: "top 95%",
+      once: true,
+      onEnter: () => {
+        gsap.to(bar, { width: targetWidth, duration: 1.4, ease: "power2.out", delay: 0.3 });
+      }
+    });
+  });
+
+  // Pricing cards entrance
+  gsap.utils.toArray(".price-card").forEach((card, i) => {
+    gsap.fromTo(card,
+      { opacity: 0, y: 60 },
+      {
+        opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
+        scrollTrigger: { trigger: card, start: "top 88%" },
+        delay: i * 0.12
+      }
+    );
+  });
+
+  // Testimonials stagger
+  gsap.utils.toArray(".testimonial").forEach((t, i) => {
+    gsap.fromTo(t,
+      { opacity: 0, scale: 0.95 },
+      {
+        opacity: 1, scale: 1, duration: 0.6, ease: "power2.out",
+        scrollTrigger: { trigger: t, start: "top 88%" },
+        delay: i * 0.1
+      }
+    );
+  });
+
+  // Nav background on scroll
+  const nav = document.querySelector("nav");
+  ScrollTrigger.create({
+    start: "top -50",
+    onUpdate: (self) => {
+      nav.style.boxShadow = self.progress > 0
+        ? "0 2px 20px rgba(10,22,40,0.08)"
+        : "none";
+    }
+  });
+</script>
 </body>
 </html>
