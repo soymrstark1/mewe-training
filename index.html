@@ -166,12 +166,20 @@
     .stat-num .stat-suffix { color:var(--gold); }
     .stat-label { font-size:.825rem; color:var(--muted); margin-top:.4rem; font-weight:500; }
 
-    /* ── TRUSTED BY ── */
-    .trusted { background:var(--bg-2); padding:4rem clamp(1.5rem,5vw,4rem); text-align:center; border-top:1px solid var(--border-l); border-bottom:1px solid var(--border-l); }
-    .trusted-heading { font-size:.8rem; font-weight:700; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; margin-bottom:2.5rem; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.7; }
-    .trusted-logos { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:2rem; max-width:900px; margin:0 auto; }
-    .trusted-logo-item { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:.875rem 1.75rem; font-size:.8rem; font-weight:700; color:var(--muted); letter-spacing:.05em; text-transform:uppercase; transition:all .25s; }
-    .trusted-logo-item:hover { border-color:var(--terra); color:var(--terra-l); transform:translateY(-2px); }
+    /* ── FOR WHO ── */
+    .for-who { background:var(--bg-2); padding:5rem clamp(1.5rem,5vw,4rem); text-align:center; border-top:1px solid var(--border-l); border-bottom:1px solid var(--border-l); }
+    .for-who-tag { font-size:.7rem; font-weight:700; letter-spacing:.2em; color:var(--terra-l); text-transform:uppercase; margin-bottom:1rem; display:block; }
+    .for-who-title { font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.5rem,2.5vw,2.1rem); font-weight:800; color:var(--text); margin-bottom:.75rem; }
+    .for-who-sub { font-size:1rem; color:var(--text-2); max-width:580px; margin:0 auto 3rem; line-height:1.7; }
+    .for-who-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1.25rem; max-width:1000px; margin:0 auto; }
+    .for-who-card {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:16px;
+      padding:1.75rem 1.5rem; text-align:left; transition:all .3s;
+    }
+    .for-who-card:hover { border-color:rgba(155,107,74,.4); background:var(--bg-card-h); transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,.3); }
+    .for-who-icon { font-size:1.75rem; margin-bottom:.875rem; display:block; }
+    .for-who-name { font-size:.95rem; font-weight:700; color:var(--text); margin-bottom:.4rem; }
+    .for-who-desc { font-size:.82rem; color:var(--muted); line-height:1.6; }
 
     /* ── COMPARISON ── */
     .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:2.5rem; }
@@ -301,9 +309,12 @@
 <!-- ═══════════ NAV ═══════════ -->
 <nav>
   <div class="nav-inner">
-    <!-- LOGO: cuando tengas el archivo, cambia esto por <img src="img/mewe-logo.svg" class="logo-img" alt="MeWe Academy"> -->
     <a href="#" class="logo-placeholder">
-      <div class="logo-img-fallback">
+      <!-- Logo: archivo img/mi-logo-mewe.png -->
+      <img src="img/mi-logo-mewe.png" class="logo-img" alt="MeWe Academy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <!-- Fallback en caso de que no exista aún el archivo -->
+      <div class="logo-img-fallback" style="display:none;">
         <span class="logo-mewe">MEWE</span>
         <span class="logo-sub">Academy</span>
       </div>
@@ -442,23 +453,51 @@
   </div>
 </div>
 
-<!-- ═══════════ TRUSTED BY ═══════════ -->
-<div class="trusted reveal">
-  <p class="trusted-heading">
-    <span data-es>Confiado por organizaciones que entienden que el conocimiento es su ventaja competitiva.</span>
-    <span data-en>Trusted by organizations that understand knowledge is their competitive advantage.</span>
+<!-- ═══════════ FOR WHO ═══════════ -->
+<div class="for-who">
+  <span class="for-who-tag reveal">
+    <span data-es>¿Para quién es?</span><span data-en>Who is it for?</span>
+  </span>
+  <h2 class="for-who-title reveal">
+    <span data-es>Construido para organizaciones que no pueden permitirse perder conocimiento.</span>
+    <span data-en>Built for organizations that can't afford to lose knowledge.</span>
+  </h2>
+  <p class="for-who-sub reveal">
+    <span data-es>Si tu organización capacita equipos, forma vendedores, certifica personal o entrena colaboradores — MeWe Academy es tu plataforma.</span>
+    <span data-en>If your organization trains teams, develops salespeople, certifies staff, or onboards employees — MeWe Academy is your platform.</span>
   </p>
-  <div class="trusted-logos">
-    <div class="trusted-logo-item"><span data-es>Su empresa aquí</span><span data-en>Your company here</span></div>
-    <div class="trusted-logo-item"><span data-es>Organización líder</span><span data-en>Leading org</span></div>
-    <div class="trusted-logo-item"><span data-es>Corporativo</span><span data-en>Corporate</span></div>
-    <div class="trusted-logo-item"><span data-es>Universidad</span><span data-en>University</span></div>
-    <div class="trusted-logo-item"><span data-es>Franquicia</span><span data-en>Franchise</span></div>
+  <div class="for-who-grid">
+    <div class="for-who-card reveal">
+      <span class="for-who-icon">🏢</span>
+      <div class="for-who-name"><span data-es>Empresas corporativas</span><span data-en>Corporate companies</span></div>
+      <div class="for-who-desc"><span data-es>Estandariza la capacitación de cientos de colaboradores con una sola plataforma bajo tu marca.</span><span data-en>Standardize training for hundreds of employees under your own brand.</span></div>
+    </div>
+    <div class="for-who-card reveal">
+      <span class="for-who-icon">🔗</span>
+      <div class="for-who-name"><span data-es>Franquicias</span><span data-en>Franchises</span></div>
+      <div class="for-who-desc"><span data-es>Capacita cada sucursal con el mismo estándar de calidad, sin importar la ciudad o país.</span><span data-en>Train every location to the same quality standard, regardless of city or country.</span></div>
+    </div>
+    <div class="for-who-card reveal">
+      <span class="for-who-icon">🎓</span>
+      <div class="for-who-name"><span data-es>Universidades y escuelas</span><span data-en>Universities & schools</span></div>
+      <div class="for-who-desc"><span data-es>Ofrece programas de educación continua y certificación bajo tu propia identidad institucional.</span><span data-en>Offer continuing education and certification programs under your own institutional identity.</span></div>
+    </div>
+    <div class="for-who-card reveal">
+      <span class="for-who-icon">📈</span>
+      <div class="for-who-name"><span data-es>Consultoras y agencias</span><span data-en>Consultancies & agencies</span></div>
+      <div class="for-who-desc"><span data-es>Entrega tu propio LMS a tus clientes como parte de tu propuesta de valor. Diferénciate de la competencia.</span><span data-en>Deliver your own LMS to clients as part of your value proposition. Stand out from competitors.</span></div>
+    </div>
+    <div class="for-who-card reveal">
+      <span class="for-who-icon">🏪</span>
+      <div class="for-who-name"><span data-es>Retail y ventas</span><span data-en>Retail & sales teams</span></div>
+      <div class="for-who-desc"><span data-es>Forma a tu fuerza de ventas con contenido rápido, medible y siempre actualizado desde el móvil.</span><span data-en>Train your sales force with fast, measurable, always-updated content from mobile.</span></div>
+    </div>
+    <div class="for-who-card reveal">
+      <span class="for-who-icon">⚙️</span>
+      <div class="for-who-name"><span data-es>Manufactura e industria</span><span data-en>Manufacturing & industry</span></div>
+      <div class="for-who-desc"><span data-es>Certifica procesos, normas de seguridad y operaciones críticas con evidencia digital trazable.</span><span data-en>Certify processes, safety standards and critical operations with traceable digital evidence.</span></div>
+    </div>
   </div>
-  <p style="margin-top:1.5rem;font-size:.8rem;color:var(--muted);">
-    <span data-es>Más de 50 organizaciones ya transformaron su entrenamiento con MeWe Academy.</span>
-    <span data-en>Over 50 organizations have already transformed their training with MeWe Academy.</span>
-  </p>
 </div>
 
 <!-- ═══════════ COMPARISON ═══════════ -->
