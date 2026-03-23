@@ -1,0 +1,1 @@
+ALTER TABLE public.teachers ALTER COLUMN auth_user_id DROP NOT NULL;

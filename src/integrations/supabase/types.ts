@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      academies: {
+        Row: {
+          access_code: string
+          admin_user_id: string
+          created_at: string | null
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_code?: string
+          admin_user_id: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_code?: string
+          admin_user_id?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      academy_students: {
+        Row: {
+          academy_id: string
+          id: string
+          is_active: boolean
+          joined_at: string | null
+          student_auth_user_id: string
+        }
+        Insert: {
+          academy_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string | null
+          student_auth_user_id: string
+        }
+        Update: {
+          academy_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string | null
+          student_auth_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academy_students_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "academies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      academy_teachers: {
+        Row: {
+          academy_id: string
+          id: string
+          is_active: boolean
+          joined_at: string | null
+          teacher_id: string
+        }
+        Insert: {
+          academy_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string | null
+          teacher_id: string
+        }
+        Update: {
+          academy_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string | null
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academy_teachers_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "academies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "academy_teachers_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           certificate_url: string | null
@@ -587,6 +691,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_live_active: boolean
+          layout: string
           name: string
           scheduled_date: string | null
           sort_order: number
@@ -606,6 +711,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_live_active?: boolean
+          layout?: string
           name?: string
           scheduled_date?: string | null
           sort_order?: number
@@ -625,6 +731,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_live_active?: boolean
+          layout?: string
           name?: string
           scheduled_date?: string | null
           sort_order?: number
@@ -790,7 +897,7 @@ export type Database = {
       teachers: {
         Row: {
           access_code: string
-          auth_user_id: string
+          auth_user_id: string | null
           avatar_url: string | null
           brand_name: string
           created_at: string | null
@@ -802,7 +909,7 @@ export type Database = {
         }
         Insert: {
           access_code?: string
-          auth_user_id: string
+          auth_user_id?: string | null
           avatar_url?: string | null
           brand_name?: string
           created_at?: string | null
@@ -814,7 +921,7 @@ export type Database = {
         }
         Update: {
           access_code?: string
-          auth_user_id?: string
+          auth_user_id?: string | null
           avatar_url?: string | null
           brand_name?: string
           created_at?: string | null
@@ -894,6 +1001,18 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_academy_admin: {
+        Args: { _academy_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_academy_manager: {
+        Args: { _teacher_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_academy_student: {
+        Args: { _academy_id: string; _user_id: string }
         Returns: boolean
       }
       is_student_of_teacher: {

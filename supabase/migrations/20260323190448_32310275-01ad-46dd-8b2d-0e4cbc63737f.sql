@@ -1,0 +1,1 @@
+ALTER TABLE public.teacher_classes ADD COLUMN layout text NOT NULL DEFAULT 'video-top';

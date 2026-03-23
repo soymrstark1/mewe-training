@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { X, StickyNote, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, StickyNote, BookOpen, ChevronLeft, ChevronRight, Minimize2, Maximize2, ZoomIn, ZoomOut, Download } from 'lucide-react';
 import SlideNotes from './SlideNotes';
 import TeacherNotesPanel from './TeacherNotesPanel';
 import ActionButtons from './ActionButtons';
@@ -11,6 +11,7 @@ import InteractiveOverlay from './InteractiveOverlay';
 import SlideIndicator from './SlideIndicator';
 import { ActionConfig } from '@/types/presentation';
 import { useFullscreen } from '@/hooks/useFullscreen';
+import { useSlideZoom } from '@/hooks/useSlideZoom';
 
 interface SlideData {
   id: string;
@@ -34,6 +35,7 @@ interface VideoSlidesViewProps {
   canTakeNotes: boolean;
   isStudent: boolean;
   teacherNotes: string;
+  layout?: string;
   onBack: () => void;
 }
 
@@ -65,6 +67,7 @@ export default function VideoSlidesView({
   canTakeNotes,
   isStudent,
   teacherNotes,
+  layout = 'video-top',
   onBack,
 }: VideoSlidesViewProps) {
   const isMobile = useIsMobile();
@@ -77,6 +80,14 @@ export default function VideoSlidesView({
   const [videoState, setVideoState] = useState<{ url: string; label: string; vertical: boolean } | null>(null);
   const [showDashConfirm, setShowDashConfirm] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [pip, setPip] = useState(false);
+
+  const zoom = useSlideZoom(pip);
+
+  // Reset zoom when slide changes
+  useEffect(() => {
+    zoom.resetZoom();
+  }, [currentSlideIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const vimeoId = extractVimeoId(videoUrl);
   const youtubeId = extractYouTubeId(videoUrl);
@@ -136,8 +147,114 @@ export default function VideoSlidesView({
 
   const canShowNotes = canTakeNotes && authUserId;
 
-  // Right panel content
   const showRightPanel = !isMobile && (showNotes || showGuide);
+
+  // Download current slide image
+  const handleDownloadSlide = useCallback(() => {
+    if (!currentSlide?.media_url) return;
+    const a = document.createElement('a');
+    a.href = currentSlide.media_url;
+    a.download = `slide-${currentSlide.slide_number}.jpg`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, [currentSlide]);
+
+  // Compute video container classes based on pip and layout
+  const videoContainerClasses = pip
+    ? `fixed z-50 rounded-lg shadow-2xl overflow-hidden border border-white/10 transition-all duration-300 ${
+        isMobile ? 'bottom-20 right-3 w-40 h-24' : 'bottom-4 right-4 w-56 h-32'
+      }`
+    : `relative transition-all duration-300 ${
+        isMobile ? 'h-[35vh] w-full shrink-0'
+        : layout === 'video-left' ? 'w-1/2 h-full shrink-0'
+        : layout === 'video-dominant' ? 'w-[70%] h-full shrink-0'
+        : 'h-[50%] w-full shrink-0'
+      }`;
+
+  // Slide image with optional zoom
+  const renderSlideImage = () => {
+    if (!currentSlide) return (
+      <div className="flex-1 flex items-center justify-center text-muted-foreground">
+        <span>No hay diapositivas disponibles</span>
+      </div>
+    );
+
+    return (
+      <>
+        <div
+          ref={pip ? zoom.containerRef : undefined}
+          className={`flex-1 min-h-0 relative flex items-center justify-center overflow-hidden bg-black/50 ${pip ? 'touch-none' : ''}`}
+          onTouchStart={pip ? zoom.handleTouchStart : undefined}
+          onTouchMove={pip ? zoom.handleTouchMove : undefined}
+          onTouchEnd={pip ? zoom.handleTouchEnd : undefined}
+          onWheel={pip ? zoom.handleWheel : undefined}
+        >
+          {currentSlide.media_url ? (
+            <img
+              src={currentSlide.media_url}
+              alt={currentSlide.title || `Slide ${currentSlide.slide_number}`}
+              className="max-w-full max-h-full object-contain select-none pointer-events-none"
+              draggable={false}
+              style={pip ? zoom.imgStyle : undefined}
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <span className="text-6xl font-bold opacity-20">{currentSlide.slide_number}</span>
+              {currentSlide.title && <span className="text-sm">{currentSlide.title}</span>}
+            </div>
+          )}
+          {totalSlides > 1 && !zoom.isZoomed && (
+            <>
+              <button onClick={prevSlide} disabled={currentSlideIndex === 0} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all disabled:opacity-20" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <ChevronLeft className="h-6 w-6 text-white" />
+              </button>
+              <button onClick={nextSlide} disabled={currentSlideIndex >= totalSlides - 1} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all disabled:opacity-20" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <ChevronRight className="h-6 w-6 text-white" />
+              </button>
+            </>
+          )}
+          {/* Zoom controls in PiP mode */}
+          {pip && (
+            <div className="absolute bottom-3 right-3 flex gap-1 z-10">
+              <button
+                onClick={zoom.handleZoomOut}
+                disabled={!zoom.isZoomed}
+                className="rounded-full p-1.5 text-white/80 backdrop-blur-sm disabled:opacity-30 hover:bg-black/70 transition-colors"
+                style={{ background: 'rgba(0,0,0,0.5)' }}
+                aria-label="Zoom out"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </button>
+              <button
+                onClick={zoom.handleZoomIn}
+                disabled={zoom.scale >= 4}
+                className="rounded-full p-1.5 text-white/80 backdrop-blur-sm disabled:opacity-30 hover:bg-black/70 transition-colors"
+                style={{ background: 'rgba(0,0,0,0.5)' }}
+                aria-label="Zoom in"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="shrink-0 flex items-center justify-center gap-3 py-2 px-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
+          {currentSlide.title && <span className="text-xs text-white/70 truncate max-w-[200px]">{currentSlide.title}</span>}
+          <span className="text-xs text-white/50">{currentSlideIndex + 1} / {totalSlides}</span>
+          {currentSlide.media_url && (
+            <button
+              onClick={handleDownloadSlide}
+              className="rounded-full p-1.5 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Descargar diapositiva"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-[1000] flex flex-col bg-black" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', paddingLeft: 'env(safe-area-inset-left)', paddingRight: 'env(safe-area-inset-right)' }}>
@@ -179,79 +296,32 @@ export default function VideoSlidesView({
 
       {/* Main content area */}
       <div className="flex-1 min-h-0 flex">
-        {/* Left: video + slides */}
-        <div className={`flex flex-col min-h-0 ${showRightPanel ? 'flex-1' : 'w-full'}`}>
-          {/* Video */}
-          <div className={`${isMobile ? 'h-[35vh]' : 'h-[50%]'} w-full shrink-0`}>
+        {/* Content: video + slides */}
+        <div className={`flex min-h-0 ${showRightPanel ? 'flex-1' : 'w-full'} ${
+          pip ? 'flex-col' :
+          !isMobile && (layout === 'video-left' || layout === 'video-dominant') ? 'flex-row' :
+          layout === 'slides-top' ? 'flex-col-reverse' : 'flex-col'
+        }`}>
+          {/* Single persistent video container — CSS moves it between inline and PiP */}
+          <div className={videoContainerClasses}>
             {(isVimeo || isYouTube) ? (
-              <iframe
-                ref={iframeRef}
-                src={embedUrl}
-                className="w-full h-full border-0"
-                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                allowFullScreen
-                title={clsName}
-              />
+              <iframe ref={iframeRef} src={embedUrl} className="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowFullScreen title={clsName} style={{ touchAction: 'none' }} />
             ) : (
               <video src={videoUrl} className="w-full h-full bg-black" controls playsInline title={clsName} />
             )}
+            <button
+              onClick={() => setPip(prev => !prev)}
+              className="absolute top-2 right-2 z-20 rounded-full p-1.5 text-white/80 backdrop-blur-sm hover:bg-black/70 transition-colors"
+              style={{ background: 'rgba(0,0,0,0.5)' }}
+              aria-label={pip ? 'Expandir video' : 'Minimizar video'}
+            >
+              {pip ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+            </button>
           </div>
 
           {/* Slides area */}
           <div className="flex-1 min-h-0 relative flex flex-col">
-            {currentSlide ? (
-              <>
-                {/* Slide image */}
-                <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden bg-black/50">
-                  {currentSlide.media_url ? (
-                    <img
-                      src={currentSlide.media_url}
-                      alt={currentSlide.title || `Slide ${currentSlide.slide_number}`}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                      <span className="text-6xl font-bold opacity-20">{currentSlide.slide_number}</span>
-                      {currentSlide.title && <span className="text-sm">{currentSlide.title}</span>}
-                    </div>
-                  )}
-
-                  {/* Prev/Next arrows */}
-                  {totalSlides > 1 && (
-                    <>
-                      <button
-                        onClick={prevSlide}
-                        disabled={currentSlideIndex === 0}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all disabled:opacity-20"
-                        style={{ background: 'rgba(0,0,0,0.5)' }}
-                      >
-                        <ChevronLeft className="h-6 w-6 text-white" />
-                      </button>
-                      <button
-                        onClick={nextSlide}
-                        disabled={currentSlideIndex >= totalSlides - 1}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all disabled:opacity-20"
-                        style={{ background: 'rgba(0,0,0,0.5)' }}
-                      >
-                        <ChevronRight className="h-6 w-6 text-white" />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-                {/* Slide indicator bar */}
-                <div className="shrink-0 flex items-center justify-center gap-3 py-2 px-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
-                  {currentSlide.title && (
-                    <span className="text-xs text-white/70 truncate max-w-[200px]">{currentSlide.title}</span>
-                  )}
-                  <span className="text-xs text-white/50">{currentSlideIndex + 1} / {totalSlides}</span>
-                </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <span>No hay diapositivas disponibles</span>
-              </div>
-            )}
+            {renderSlideImage()}
           </div>
         </div>
 
@@ -306,7 +376,7 @@ export default function VideoSlidesView({
         </div>
       )}
 
-      {/* Action buttons FAB (for slide actions) */}
+      {/* Action buttons FAB */}
       {currentActionConfig && (
         <ActionButtons
           config={currentActionConfig}

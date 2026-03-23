@@ -217,8 +217,7 @@ export default function ClassManager({ teacherId }: { teacherId: string }) {
 
   const renderClassCover = (cls: TeacherClass) => {
     switch (cls.class_type) {
-      case 'video':
-      case 'video_slides': {
+      case 'video': {
         const thumb = cls.video_url ? getVideoThumbnail(cls.video_url) : null;
         return (
           <div className="relative aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
@@ -228,9 +227,6 @@ export default function ClassManager({ teacherId }: { teacherId: string }) {
                 <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center">
                   <Play className="h-10 w-10 text-background drop-shadow-lg" />
                 </div>
-                {cls.class_type === 'video_slides' && (
-                  <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">+ Slides</span>
-                )}
               </>
             ) : (
               <div className="flex flex-col items-center gap-1 text-muted-foreground">
@@ -238,6 +234,35 @@ export default function ClassManager({ teacherId }: { teacherId: string }) {
                 <span className="text-xs">Sin video aún</span>
               </div>
             )}
+          </div>
+        );
+      }
+      case 'video_slides': {
+        const thumb = cls.video_url ? getVideoThumbnail(cls.video_url) : null;
+        return (
+          <div
+            className="relative aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => triggerUpload(cls.id)}
+          >
+            {cls.cover_image_url ? (
+              <img src={cls.cover_image_url} alt={cls.name} className="w-full h-full object-cover" />
+            ) : thumb ? (
+              <>
+                <img src={thumb} alt={cls.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center">
+                  <Play className="h-10 w-10 text-background drop-shadow-lg" />
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                <Film className="h-8 w-8" />
+                <span className="text-xs">Click para subir portada</span>
+              </div>
+            )}
+            <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">🎓 Video + Slides</span>
+            <div className="absolute top-2 right-2 bg-background/80 rounded-full p-1">
+              <Upload className="h-3.5 w-3.5 text-foreground" />
+            </div>
           </div>
         );
       }
@@ -356,6 +381,31 @@ export default function ClassManager({ teacherId }: { teacherId: string }) {
                 onBlur={e => updateClass(cls.id, 'video_url', e.target.value || null)}
                 onKeyDown={e => { if (e.key === 'Enter') updateClass(cls.id, 'video_url', (e.target as HTMLInputElement).value || null); }}
               />
+            </div>
+            {/* Layout selector */}
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground font-medium">Disposición</span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { value: 'video-top', label: '▶️ Video arriba', desc: 'Slides abajo' },
+                  { value: 'video-left', label: '◀️ Video izq.', desc: 'Slides derecha' },
+                  { value: 'slides-top', label: '📊 Slides arriba', desc: 'Video abajo' },
+                  { value: 'video-dominant', label: '🎬 Video grande', desc: 'Slides lateral' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateClass(cls.id, 'layout', opt.value)}
+                    className={`text-left p-1.5 rounded border text-xs transition-colors ${
+                      ((cls as any).layout || 'video-top') === opt.value
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border text-muted-foreground hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="font-medium">{opt.label}</div>
+                    <div className="text-[10px] opacity-70">{opt.desc}</div>
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1 text-muted-foreground">

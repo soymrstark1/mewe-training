@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus, Pencil, Check, X, Clock, Link, Search, MoreVertical, Shield, GraduationCap, UserCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, UserPlus, Pencil, Check, X, Clock, Link, Search, MoreVertical, Shield, GraduationCap, UserCheck, Sparkles, Building2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -69,6 +69,39 @@ export default function AdminPanel() {
   const [userSearch, setUserSearch] = useState('');
   const [newUserSearch, setNewUserSearch] = useState('');
   const [requestSubTab, setRequestSubTab] = useState<'pending' | 'history'>('pending');
+
+  // Academy creation
+  const [academyDialogOpen, setAcademyDialogOpen] = useState(false);
+  const [academyForm, setAcademyForm] = useState({ name: '' });
+  const [creatingAcademy, setCreatingAcademy] = useState(false);
+
+  const createAcademy = async () => {
+    if (!academyForm.name.trim()) { toast.error('El nombre es obligatorio'); return; }
+    setCreatingAcademy(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error('No autenticado'); setCreatingAcademy(false); return; }
+
+    // Ensure the user has the academy role
+    await supabase.from('user_roles').upsert(
+      { user_id: user.id, role: 'academy' as any },
+      { onConflict: 'user_id,role' }
+    );
+
+    const { data, error } = await supabase
+      .from('academies')
+      .insert({ name: academyForm.name.trim(), admin_user_id: user.id })
+      .select()
+      .single();
+
+    if (error) {
+      toast.error('Error al crear academia: ' + error.message);
+    } else {
+      toast.success(`Academia "${data.name}" creada. Código: ${data.access_code}`);
+      setAcademyForm({ name: '' });
+      setAcademyDialogOpen(false);
+    }
+    setCreatingAcademy(false);
+  };
 
   useEffect(() => {
     if (!checkingRole && !hasAdminAccess) navigate('/dashboard');
@@ -292,6 +325,34 @@ export default function AdminPanel() {
                 </div>
               </DialogContent>
             </Dialog>
+
+            {isSuperadmin && (
+              <Dialog open={academyDialogOpen} onOpenChange={setAcademyDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Building2 className="h-4 w-4" /> Nueva Academia
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Crear Nueva Academia</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <Input
+                      placeholder="Nombre de la academia (ej: MDC)"
+                      value={academyForm.name}
+                      onChange={e => setAcademyForm({ name: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Se generará un código de acceso automáticamente. Tú serás el administrador de esta academia.
+                    </p>
+                    <Button className="w-full" onClick={createAcademy} disabled={creatingAcademy}>
+                      {creatingAcademy ? 'Creando...' : 'Crear Academia'}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
       </header>

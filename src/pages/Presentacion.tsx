@@ -45,6 +45,7 @@ interface ClassInfo {
   name: string;
   scheduled_date: string | null;
   teacher_notes: string;
+  layout: string;
 }
 
 export default function Presentacion() {
@@ -122,7 +123,7 @@ export default function Presentacion() {
       if (classId) {
         const { data: cls } = await supabase
           .from('teacher_classes')
-          .select('class_type, video_url, external_url, name, scheduled_date, feedback_enabled, teacher_notes')
+          .select('class_type, video_url, external_url, name, scheduled_date, feedback_enabled, teacher_notes, layout')
           .eq('id', classId)
           .maybeSingle();
         if (cls) {
@@ -134,6 +135,7 @@ export default function Presentacion() {
             name: cls.name,
             scheduled_date: (cls as any).scheduled_date || null,
             teacher_notes: (cls as any).teacher_notes || '',
+            layout: (cls as any).layout || 'video-top',
           });
 
           const ct = (cls as any).class_type || 'slides';
@@ -404,6 +406,7 @@ export default function Presentacion() {
           canTakeNotes={canTakeNotes}
           isStudent={isStudent}
           teacherNotes={classInfo.teacher_notes}
+          layout={classInfo.layout}
           onBack={actualGoBack}
         />
         {feedbackDialogs}

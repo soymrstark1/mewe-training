@@ -115,6 +115,39 @@ export default function Login() {
     }
     setLoading(true);
 
+    // First check if it's an academy code
+    const { data: academyMatch } = await supabase
+      .from('academies')
+      .select('id, name')
+      .eq('access_code', accessCode.trim().toLowerCase())
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (academyMatch) {
+      // Sign up the student
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+        email, password, options: { data: { name } },
+      });
+      if (signUpErr) { toast.error(signUpErr.message); setLoading(false); return; }
+      if (signUpData.user) {
+        // Enroll in academy
+        await supabase.from('academy_students').insert({
+          academy_id: academyMatch.id,
+          student_auth_user_id: signUpData.user.id,
+        });
+        // Auto-enroll in all academy teachers
+        const { data: acTeachers } = await supabase.from('academy_teachers').select('teacher_id').eq('academy_id', academyMatch.id).eq('is_active', true);
+        if (acTeachers && acTeachers.length > 0) {
+          const enrollments = acTeachers.map(at => ({ teacher_id: at.teacher_id, student_auth_user_id: signUpData.user!.id }));
+          await supabase.from('teacher_students').upsert(enrollments, { onConflict: 'teacher_id,student_auth_user_id' } as any);
+        }
+        toast.success(`¡Inscripción exitosa en ${academyMatch.name}!`);
+        navigate('/dashboard');
+      }
+      setLoading(false);
+      return;
+    }
+
     // Find teacher by access code
     const { data: teacher, error: teacherErr } = await supabase
       .from('teachers')

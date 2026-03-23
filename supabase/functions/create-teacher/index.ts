@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify caller is superadmin
+    // Verify caller is superadmin, admin, or academy
     const callerClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -27,41 +27,58 @@ Deno.serve(async (req) => {
       .from("user_roles")
       .select("role")
       .eq("user_id", caller.id)
-      .in("role", ["superadmin", "admin"]);
+      .in("role", ["superadmin", "admin", "academy"]);
 
-    if (!roleData || roleData.length === 0) throw new Error("Not authorized - admin only");
+    if (!roleData || roleData.length === 0) throw new Error("Not authorized - admin/academy only");
 
-    const { email, password, name, brand_name } = await req.json();
-    if (!email || !password || !name) throw new Error("Missing required fields");
+    const { email, password, name, brand_name, academy_id } = await req.json();
+    if (!name) throw new Error("Missing required field: name");
 
-    // Create auth user
-    const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { name },
-    });
-    if (createError) throw createError;
+    let authUserId: string | null = null;
 
-    // Assign teacher role
-    await adminClient.from("user_roles").insert({
-      user_id: newUser.user.id,
-      role: "teacher",
-    });
+    // If email and password provided, create auth user
+    if (email && password) {
+      const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { name },
+      });
+      if (createError) throw createError;
+      authUserId = newUser.user.id;
 
-    // Create teacher record
+      // Assign teacher role
+      await adminClient.from("user_roles").insert({
+        user_id: authUserId,
+        role: "teacher",
+      });
+    }
+
+    // Create teacher record (auth_user_id can be null for placeholder teachers)
+    const teacherInsert: Record<string, unknown> = {
+      name,
+      brand_name: brand_name || name,
+      created_by: caller.id,
+    };
+    if (authUserId) {
+      teacherInsert.auth_user_id = authUserId;
+    }
+
     const { data: teacher, error: teacherError } = await adminClient
       .from("teachers")
-      .insert({
-        auth_user_id: newUser.user.id,
-        name,
-        brand_name: brand_name || name,
-        created_by: caller.id,
-      })
+      .insert(teacherInsert)
       .select()
       .single();
 
     if (teacherError) throw teacherError;
+
+    // If academy_id provided, link teacher to academy
+    if (academy_id) {
+      await adminClient.from("academy_teachers").insert({
+        academy_id,
+        teacher_id: teacher.id,
+      });
+    }
 
     return new Response(JSON.stringify({ teacher }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

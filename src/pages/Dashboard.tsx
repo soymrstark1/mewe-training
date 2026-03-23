@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, Play, Settings, Shield, Pencil, FileText, Settings2, Film, Globe, GraduationCap, BookOpen, ArrowLeft, HelpCircle, Menu, MessageSquare, CheckCircle2, Download, ChevronDown, ChevronUp, Award } from 'lucide-react';
+import { LogOut, Play, Settings, Shield, Pencil, FileText, Settings2, Film, Globe, GraduationCap, BookOpen, ArrowLeft, HelpCircle, Menu, MessageSquare, CheckCircle2, Download, ChevronDown, ChevronUp, Award, School } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAcademyBrand } from '@/hooks/useAcademyBrand';
 import { useLiveClassesEnabled } from '@/hooks/useLiveClassesEnabled';
@@ -78,6 +78,10 @@ export default function Dashboard() {
   const [authUserId, setAuthUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<UserRole[]>([]);
+  const [isAcademy, setIsAcademy] = useState(false);
+  const [enrolledAcademies, setEnrolledAcademies] = useState<{id: string; name: string; logo_url: string | null}[]>([]);
+  const [selectedAcademyId, setSelectedAcademyId] = useState<string | null>(null);
+  const [academyTeachers, setAcademyTeachers] = useState<TeacherCard[]>([]);
   const [teacherId, setTeacherId] = useState<string | null>(null);
   const [enrolledTeachers, setEnrolledTeachers] = useState<TeacherCard[]>([]);
   const [studentClasses, setStudentClasses] = useState<ClassCard[]>([]);
@@ -134,9 +138,28 @@ export default function Dashboard() {
       if (roleRes.data?.some(r => r.role === 'superadmin')) userRoles.push('superadmin');
       if (roleRes.data?.some(r => r.role === 'admin')) userRoles.push('superadmin');
       if (roleRes.data?.some(r => r.role === 'teacher')) userRoles.push('teacher');
+      const hasAcademyRole = roleRes.data?.some(r => r.role === 'academy') ?? false;
+      setIsAcademy(hasAcademyRole);
 
       const teacher = teacherRes.data;
       const enrollments = enrollRes.data;
+
+      // Load academies student is enrolled in
+      const { data: academyEnrollments } = await supabase
+        .from('academy_students')
+        .select('academy_id')
+        .eq('student_auth_user_id', user.id)
+        .eq('is_active', true);
+
+      if (academyEnrollments && academyEnrollments.length > 0) {
+        const academyIds = academyEnrollments.map(a => a.academy_id);
+        const { data: academyData } = await supabase
+          .from('academies')
+          .select('id, name, logo_url')
+          .in('id', academyIds)
+          .eq('is_active', true);
+        if (academyData) setEnrolledAcademies(academyData);
+      }
 
       // Batch 2: Queries that depend on teacher + enrollments (run in parallel)
       const tClassesPromise = teacher
@@ -458,11 +481,11 @@ export default function Dashboard() {
         )}
 
         {/* Panel toggle buttons */}
-        <div className="flex justify-center gap-4 max-w-lg mx-auto">
+        <div className="flex justify-center gap-4 max-w-lg mx-auto flex-wrap">
           {(isTeacher || isSuperadmin) && teacherId && (
             <button
-              onClick={() => { setActivePanel(activePanel === 'teacher' ? 'none' : 'teacher'); setSelectedTeacherId(null); }}
-              className={`flex-1 flex flex-col items-center gap-2 rounded-2xl border-2 p-6 transition-all shadow-md hover:shadow-lg ${
+              onClick={() => { setActivePanel(activePanel === 'teacher' ? 'none' : 'teacher'); setSelectedTeacherId(null); setSelectedAcademyId(null); }}
+              className={`flex-1 min-w-[140px] flex flex-col items-center gap-2 rounded-2xl border-2 p-6 transition-all shadow-md hover:shadow-lg ${
                 activePanel === 'teacher'
                   ? 'border-primary bg-primary/10 shadow-primary/20'
                   : 'border-border bg-card hover:border-primary/40'
@@ -474,9 +497,18 @@ export default function Dashboard() {
               </span>
             </button>
           )}
+          {isAcademy && (
+            <button
+              onClick={() => navigate('/academy')}
+              className="flex-1 min-w-[140px] flex flex-col items-center gap-2 rounded-2xl border-2 p-6 transition-all shadow-md hover:shadow-lg border-border bg-card hover:border-violet-500/40"
+            >
+              <School className="h-10 w-10 text-muted-foreground" />
+              <span className="text-lg font-bold text-foreground">Panel Academia</span>
+            </button>
+          )}
           <button
-            onClick={() => { setActivePanel(activePanel === 'student' ? 'none' : 'student'); setSelectedTeacherId(null); }}
-            className={`flex-1 flex flex-col items-center gap-2 rounded-2xl border-2 p-6 transition-all shadow-md hover:shadow-lg ${
+            onClick={() => { setActivePanel(activePanel === 'student' ? 'none' : 'student'); setSelectedTeacherId(null); setSelectedAcademyId(null); }}
+            className={`flex-1 min-w-[140px] flex flex-col items-center gap-2 rounded-2xl border-2 p-6 transition-all shadow-md hover:shadow-lg ${
               activePanel === 'student'
                 ? 'border-emerald-500 bg-emerald-500/10 shadow-emerald-500/20'
                 : 'border-border bg-card hover:border-emerald-500/40'
@@ -620,15 +652,34 @@ export default function Dashboard() {
 
                 {/* Join form */}
                 <div className="w-full max-w-md mx-auto space-y-3">
-                  <h3 className="text-base font-semibold text-foreground text-center">Unirte a un maestro</h3>
+                  <h3 className="text-base font-semibold text-foreground text-center">Unirte a un maestro o academia</h3>
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
                       if (!accessCode.trim() || joiningCode) return;
                       setJoiningCode(true);
                       const code = accessCode.trim().toLowerCase();
+
+                      // First check if it's an academy code
+                      const { data: academyMatch } = await supabase.from('academies').select('id, name').eq('access_code', code).eq('is_active', true).maybeSingle();
+                      if (academyMatch) {
+                        const { data: existingEnroll } = await supabase.from('academy_students').select('id').eq('academy_id', academyMatch.id).eq('student_auth_user_id', authUserId).maybeSingle();
+                        if (existingEnroll) { toast({ title: 'Ya inscrito', description: `Ya estás inscrito en ${academyMatch.name}.` }); setAccessCode(''); setJoiningCode(false); return; }
+                        await supabase.from('academy_students').insert({ academy_id: academyMatch.id, student_auth_user_id: authUserId });
+                        // Auto-enroll in all academy teachers
+                        const { data: acTeachers } = await supabase.from('academy_teachers').select('teacher_id').eq('academy_id', academyMatch.id).eq('is_active', true);
+                        if (acTeachers && acTeachers.length > 0) {
+                          const enrollments = acTeachers.map(at => ({ teacher_id: at.teacher_id, student_auth_user_id: authUserId }));
+                          await supabase.from('teacher_students').upsert(enrollments, { onConflict: 'teacher_id,student_auth_user_id' } as any);
+                        }
+                        toast({ title: '¡Inscrito!', description: `Te has unido a la academia ${academyMatch.name}.` });
+                        setAccessCode(''); setJoiningCode(false); window.location.reload();
+                        return;
+                      }
+
+                      // Then check teacher code
                       const { data: teacher } = await supabase.from('teachers').select('id, name, brand_name').eq('access_code', code).eq('is_active', true).maybeSingle();
-                      if (!teacher) { toast({ title: 'Código no válido', description: 'No se encontró un maestro con ese código.', variant: 'destructive' }); setJoiningCode(false); return; }
+                      if (!teacher) { toast({ title: 'Código no válido', description: 'No se encontró un maestro o academia con ese código.', variant: 'destructive' }); setJoiningCode(false); return; }
                       const { data: existing } = await supabase.from('teacher_students').select('id').eq('teacher_id', teacher.id).eq('student_auth_user_id', authUserId).maybeSingle();
                       if (existing) { toast({ title: 'Ya inscrito', description: `Ya estás inscrito con ${teacher.brand_name || teacher.name}.` }); setAccessCode(''); setJoiningCode(false); return; }
                       const { error } = await supabase.from('teacher_students').insert({ teacher_id: teacher.id, student_auth_user_id: authUserId });
@@ -642,6 +693,70 @@ export default function Dashboard() {
                     <Button type="submit" disabled={!accessCode.trim() || joiningCode}>{joiningCode ? 'Uniendo...' : 'Unirme'}</Button>
                   </form>
                 </div>
+
+                {/* Enrolled Academies */}
+                {enrolledAcademies.length > 0 && (
+                  <div className="w-full max-w-2xl mx-auto">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 text-center">🏫 Mis Academias</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {enrolledAcademies.map(ac => (
+                        <button
+                          key={ac.id}
+                          onClick={async () => {
+                            setSelectedAcademyId(ac.id);
+                            // Load teachers for this academy
+                            const { data: atData } = await supabase.from('academy_teachers').select('teacher_id').eq('academy_id', ac.id).eq('is_active', true);
+                            if (atData && atData.length > 0) {
+                              const tIds = atData.map(a => a.teacher_id);
+                              const { data: tData } = await supabase.from('teachers').select('id, name, brand_name, avatar_url').in('id', tIds).eq('is_active', true);
+                              setAcademyTeachers(tData || []);
+                            } else {
+                              setAcademyTeachers([]);
+                            }
+                          }}
+                          className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-6 shadow-md hover:shadow-lg hover:border-violet-500/40 transition-all"
+                        >
+                          <School className="h-12 w-12 text-violet-500" />
+                          <span className="font-semibold text-foreground text-center text-sm leading-tight">{ac.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Academy teachers view */}
+                {selectedAcademyId && (
+                  <div className="w-full max-w-2xl mx-auto space-y-4">
+                    <button
+                      onClick={() => { setSelectedAcademyId(null); setAcademyTeachers([]); }}
+                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <ArrowLeft className="h-4 w-4" /> Mis Academias
+                    </button>
+                    <h3 className="text-lg font-semibold text-foreground">Maestros de {enrolledAcademies.find(a => a.id === selectedAcademyId)?.name}</h3>
+                    {academyTeachers.length > 0 ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {academyTeachers.map(t => (
+                          <button
+                            key={t.id}
+                            onClick={() => { setSelectedTeacherId(t.id); setSelectedAcademyId(null); }}
+                            className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-6 shadow-md hover:shadow-lg hover:border-emerald-500/40 transition-all"
+                          >
+                            <Avatar className="h-16 w-16">
+                              {t.avatar_url && <AvatarImage src={t.avatar_url} alt={t.brand_name || t.name} />}
+                              <AvatarFallback className="text-lg font-bold bg-emerald-500/10 text-emerald-600">
+                                {getTeacherInitials(t)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-semibold text-foreground text-center text-sm leading-tight">{t.brand_name || t.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4">Esta academia aún no tiene maestros.</p>
+                    )}
+                  </div>
+                )}
 
                 {/* Enrolled teachers grid */}
                 {enrolledTeachers.length > 0 ? (

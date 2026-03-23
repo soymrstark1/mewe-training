@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export function useAdminCheck() {
   const [isSuperadmin, setIsSuperadmin] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAcademy, setIsAcademy] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export function useAdminCheck() {
       if (data) {
         setIsSuperadmin(data.some(r => r.role === 'superadmin'));
         setIsAdmin(data.some(r => r.role === 'admin'));
+        setIsAcademy(data.some(r => r.role === 'academy'));
       }
       setIsLoading(false);
     };
@@ -27,5 +29,5 @@ export function useAdminCheck() {
 
   const hasAdminAccess = isSuperadmin || isAdmin;
 
-  return { isSuperadmin, isAdmin, hasAdminAccess, isLoading };
+  return { isSuperadmin, isAdmin, isAcademy, hasAdminAccess, isLoading };
 }

@@ -10,6 +10,7 @@ import TeacherPanel from "./pages/TeacherPanel";
 import Presentacion from "./pages/Presentacion";
 import Guia from "./pages/Guia";
 import PlataformaPanel from "./pages/PlataformaPanel";
+import AcademyPanel from "./pages/AcademyPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/presentacion/:teacherId/:classId" element={<Presentacion />} />
           <Route path="/guia" element={<Guia />} />
           <Route path="/plataforma" element={<PlataformaPanel />} />
+          <Route path="/academy" element={<AcademyPanel />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
