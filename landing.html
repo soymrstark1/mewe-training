@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-lang="es">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,545 +7,293 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
-  <!-- GSAP para animaciones premium -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <style>
-    /* ── RESET & BASE ── */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
-      /* ── Paleta oscura elegante (inspirada en Cicla) ── */
-      --bg:        #0B1426;       /* fondo principal — navy casi negro */
-      --bg-2:      #0F1D35;       /* fondo alternativo secciones */
-      --bg-3:      #071120;       /* fondo más oscuro para contraste */
-      --bg-card:   rgba(255,255,255,.045); /* tarjetas con glassmorphism */
-      --bg-card-h: rgba(255,255,255,.08);  /* tarjeta hover */
-
-      /* Texto */
-      --text:      #F0EDE8;       /* cream/off-white — texto principal */
-      --text-2:    rgba(240,237,232,.70); /* texto secundario */
-      --muted:     rgba(240,237,232,.42); /* texto deshabilitado */
-
-      /* Acento terracota/marrón cálido (botones CTA, como Cicla) */
+      --bg:        #0B1426;
+      --bg-2:      #0F1D35;
+      --bg-3:      #071120;
+      --bg-card:   rgba(255,255,255,.045);
+      --bg-card-h: rgba(255,255,255,.08);
+      --text:      #F0EDE8;
+      --text-2:    rgba(240,237,232,.70);
+      --muted:     rgba(240,237,232,.42);
       --terra:     #9B6B4A;
-      --terra-l:   #B57D5A;       /* terracota clara (hover) */
-      --terra-d:   #7A5236;       /* terracota oscura */
-
-      /* Acento dorado/ámbar para highlights */
+      --terra-l:   #B57D5A;
+      --terra-d:   #7A5236;
       --gold:      #C9A96E;
       --gold-l:    #DFC08A;
-
-      /* Acento verde esmeralda (métricas positivas) */
       --green:     #34D399;
       --green-d:   #10B981;
-
-      /* Acento azul sutil (chips, badges) */
       --blue:      #60A5FA;
-      --blue-d:    #2563EB;
-
-      /* Bordes y divisores */
       --border:    rgba(240,237,232,.10);
       --border-l:  rgba(240,237,232,.06);
     }
     html { scroll-behavior: smooth; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 16px; line-height: 1.6;
-      overflow-x: hidden;
+      background: var(--bg); color: var(--text);
+      font-size: 16px; line-height: 1.6; overflow-x: hidden;
     }
-
-    /* ── TIPOGRAFÍA SERIF para headings ── */
     h1, .section-h2, .comp-title, .guarantee h3, .cta-section h2 {
       font-family: 'Playfair Display', Georgia, serif;
     }
 
     /* ── LOGO ── */
+    .logo-placeholder { display:flex; flex-direction:column; gap:2px; text-decoration:none; }
+    .logo-img { height:40px; width:auto; display:block; }
+    .logo-img-fallback {
+      display:flex; flex-direction:column; gap:2px;
+    }
     .logo-mewe {
-      font-size: 1.75rem; font-weight: 900;
-      letter-spacing: .2em; color: var(--text);
-      font-family: 'Inter', sans-serif;
-      position: relative; display: inline-block; line-height: 1;
+      font-size:1.75rem; font-weight:900; letter-spacing:.2em;
+      color:var(--text); font-family:'Inter',sans-serif;
+      position:relative; display:inline-block; line-height:1;
     }
-    .logo-mewe::after {
-      content:''; position:absolute; left:0; right:0; top:0; bottom:0;
-      background: repeating-linear-gradient(
-        180deg,
-        transparent 0px, transparent 6px,
-        rgba(11,20,38,0.6) 6px, rgba(11,20,38,0.6) 8px
-      );
-      pointer-events:none;
+    .logo-sub { font-size:.6rem; font-weight:600; letter-spacing:.35em; color:var(--muted); text-transform:uppercase; }
+
+    /* ── LANGUAGE TOGGLE ── */
+    .lang-toggle {
+      display:flex; align-items:center; gap:.25rem;
+      background: var(--bg-card); border:1px solid var(--border);
+      border-radius:20px; padding:.2rem .3rem;
     }
-    .logo-sub {
-      font-size: .6rem; font-weight: 600;
-      letter-spacing: .35em; color: var(--muted);
-      text-transform: uppercase;
+    .lang-btn {
+      display:flex; align-items:center; gap:.35rem;
+      padding:.3rem .65rem; border-radius:16px;
+      font-size:.75rem; font-weight:600; cursor:pointer;
+      border:none; background:transparent; color:var(--muted);
+      transition:all .2s; letter-spacing:.03em;
     }
-    .logo-placeholder {
-      display: flex; flex-direction: column; gap: 2px; text-decoration: none;
+    .lang-btn .flag { font-size:1rem; line-height:1; }
+    .lang-btn.active {
+      background:var(--terra); color:var(--text);
     }
+    .lang-btn:hover:not(.active) { color:var(--text-2); }
 
     /* ── NAV ── */
     nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(11,20,38,.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      position:sticky; top:0; z-index:100;
+      background:rgba(11,20,38,.92);
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+      padding:0 clamp(1.5rem,5vw,4rem);
     }
     .nav-inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items:center; justify-content:space-between;
-      height: 64px;
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between; height:64px;
     }
     .nav-links { display:flex; gap:2rem; list-style:none; }
-    .nav-links a {
-      text-decoration:none; color: var(--text-2);
-      font-size:.875rem; font-weight:500;
-      transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-ctas { display:flex; gap:.75rem; align-items:center; }
+    .nav-links a { text-decoration:none; color:var(--text-2); font-size:.875rem; font-weight:500; transition:color .2s; }
+    .nav-links a:hover { color:var(--text); }
+    .nav-right { display:flex; gap:.75rem; align-items:center; }
     .btn-ghost {
-      padding: .5rem 1.25rem; border-radius: 8px;
-      font-size:.875rem; font-weight:600; cursor:pointer;
-      background:transparent; border:1.5px solid var(--border);
-      color: var(--text-2); text-decoration:none; transition:all .2s;
+      padding:.5rem 1.25rem; border-radius:8px; font-size:.875rem; font-weight:600;
+      background:transparent; border:1.5px solid var(--border); color:var(--text-2);
+      text-decoration:none; transition:all .2s; cursor:pointer;
     }
-    .btn-ghost:hover { border-color: var(--terra-l); color: var(--text); }
+    .btn-ghost:hover { border-color:var(--terra-l); color:var(--text); }
     .btn-primary {
-      padding: .5rem 1.25rem; border-radius: 8px;
-      font-size:.875rem; font-weight:600; cursor:pointer;
-      background: var(--terra); color: var(--text);
-      border: none; text-decoration:none; transition:all .2s;
+      padding:.5rem 1.25rem; border-radius:8px; font-size:.875rem; font-weight:600;
+      background:var(--terra); color:var(--text); border:none;
+      text-decoration:none; transition:all .2s; cursor:pointer;
     }
-    .btn-primary:hover { background: var(--terra-l); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(155,107,74,.35); }
+    .btn-primary:hover { background:var(--terra-l); transform:translateY(-1px); box-shadow:0 4px 16px rgba(155,107,74,.35); }
 
     /* ── HERO ── */
     .hero {
-      max-width: 1200px; margin: 0 auto;
-      padding: 6rem clamp(1.5rem, 5vw, 4rem) 4rem;
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 4rem; align-items: center;
+      max-width:1200px; margin:0 auto; padding:6rem clamp(1.5rem,5vw,4rem) 4rem;
+      display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center;
     }
     .hero-eyebrow {
-      font-size: .7rem; font-weight: 700;
-      letter-spacing: .2em; color: var(--gold);
-      text-transform: uppercase; margin-bottom: 1.25rem;
-      display: inline-flex; align-items: center; gap: .5rem;
+      font-size:.7rem; font-weight:700; letter-spacing:.2em; color:var(--gold);
+      text-transform:uppercase; margin-bottom:1.25rem;
+      display:inline-flex; align-items:center; gap:.5rem;
     }
-    .hero-category {
-      font-size: .85rem; font-weight: 700;
-      letter-spacing: .12em; color: var(--muted);
-      text-transform: uppercase; margin-bottom: .75rem;
-    }
-    .hero h1 {
-      font-size: clamp(2.4rem, 4.5vw, 3.5rem);
-      font-weight: 800; line-height: 1.1;
-      color: var(--text); margin-bottom: 1.25rem;
-      font-style: normal;
-    }
-    .hero h1 .accent { color: var(--gold); }
-    .hero-subtitle {
-      font-size: 1.125rem; color: var(--text-2);
-      line-height: 1.7; margin-bottom: .75rem;
-      font-weight: 400;
-    }
-    .hero-tagline {
-      font-size: 1rem; color: var(--muted);
-      font-style: italic; margin-bottom: 2rem;
-      padding-left: 1rem; border-left: 3px solid var(--terra);
-    }
+    .hero-category { font-size:.85rem; font-weight:700; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; margin-bottom:.75rem; }
+    .hero h1 { font-size:clamp(2.4rem,4.5vw,3.5rem); font-weight:800; line-height:1.1; color:var(--text); margin-bottom:1.25rem; }
+    .hero h1 .accent { color:var(--gold); }
+    .hero-subtitle { font-size:1.125rem; color:var(--text-2); line-height:1.7; margin-bottom:.75rem; }
+    .hero-tagline { font-size:1rem; color:var(--muted); font-style:italic; margin-bottom:2rem; padding-left:1rem; border-left:3px solid var(--terra); }
     .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; }
-    .btn-hero {
-      padding: .875rem 2rem; border-radius: 10px;
-      font-size:1rem; font-weight:700; cursor:pointer;
-      text-decoration:none; transition:all .25s;
-      display: inline-flex; align-items:center; gap:.5rem;
-    }
-    .btn-hero-primary {
-      background: var(--terra); color: var(--text); border:none;
-      box-shadow: 0 4px 24px rgba(155,107,74,.4);
-    }
-    .btn-hero-primary:hover { background: var(--terra-l); transform:translateY(-2px); box-shadow: 0 8px 32px rgba(155,107,74,.5); }
-    .btn-hero-outline {
-      background: transparent; color: var(--text-2);
-      border: 1.5px solid var(--border);
-    }
-    .btn-hero-outline:hover { border-color: var(--terra); color: var(--text); }
+    .btn-hero { padding:.875rem 2rem; border-radius:10px; font-size:1rem; font-weight:700; text-decoration:none; transition:all .25s; display:inline-flex; align-items:center; gap:.5rem; cursor:pointer; }
+    .btn-hero-primary { background:var(--terra); color:var(--text); border:none; box-shadow:0 4px 24px rgba(155,107,74,.4); }
+    .btn-hero-primary:hover { background:var(--terra-l); transform:translateY(-2px); box-shadow:0 8px 32px rgba(155,107,74,.5); }
+    .btn-hero-outline { background:transparent; color:var(--text-2); border:1.5px solid var(--border); }
+    .btn-hero-outline:hover { border-color:var(--terra); color:var(--text); }
 
     /* ── DASHBOARD MOCK ── */
     .dashboard-mock {
-      background: #0F1D35;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.07);
-      will-change: transform;
-      border: 1px solid var(--border);
+      background:#0F1D35; border-radius:16px; overflow:hidden;
+      box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07);
+      will-change:transform; border:1px solid var(--border);
     }
     .mock-bar {
-      background: rgba(255,255,255,.04);
-      padding: .75rem 1.25rem;
-      display: flex; align-items: center; gap: .5rem;
-      border-bottom: 1px solid var(--border-l);
+      background:rgba(255,255,255,.04); padding:.75rem 1.25rem;
+      display:flex; align-items:center; gap:.5rem; border-bottom:1px solid var(--border-l);
     }
     .mock-dot { width:10px; height:10px; border-radius:50%; }
-    .mock-title { color: var(--text-2); font-size:.8rem; font-weight:600; margin-left:.5rem; flex:1; }
-    .mock-live { font-size:.7rem; color: var(--green); font-weight:700; letter-spacing:.05em; }
-    .mock-body { padding: 1.25rem; display:flex; flex-direction:column; gap:1rem; }
+    .mock-title { color:var(--text-2); font-size:.8rem; font-weight:600; margin-left:.5rem; flex:1; }
+    .mock-live { font-size:.7rem; color:var(--green); font-weight:700; letter-spacing:.05em; }
+    .mock-body { padding:1.25rem; display:flex; flex-direction:column; gap:1rem; }
     .mock-chips { display:flex; gap:.5rem; flex-wrap:wrap; }
-    .chip {
-      font-size: .7rem; font-weight:600; padding:.3rem .75rem;
-      border-radius:20px; letter-spacing:.02em;
-    }
+    .chip { font-size:.7rem; font-weight:600; padding:.3rem .75rem; border-radius:20px; letter-spacing:.02em; }
     .chip-blue { background:rgba(96,165,250,.15); color:#93C5FD; }
     .chip-green { background:rgba(52,211,153,.15); color:#6EE7B7; }
     .chip-amber { background:rgba(201,169,110,.15); color:#DFC08A; }
-    .mock-metric {
-      display:flex; justify-content:space-between; align-items:center;
-      color: var(--text-2); font-size:.825rem;
-    }
-    .metric-val { font-weight:700; color: var(--green); font-size:.9rem; }
+    .mock-metric { display:flex; justify-content:space-between; align-items:center; color:var(--text-2); font-size:.825rem; }
+    .metric-val { font-weight:700; color:var(--green); font-size:.9rem; }
     .mock-bar-wrap { background:rgba(255,255,255,.06); border-radius:4px; height:5px; overflow:hidden; }
-    .mock-bar-fill { height:100%; border-radius:4px; background: linear-gradient(90deg, var(--terra), var(--gold)); transition: width 1.5s ease; }
-    .mock-card {
-      background: rgba(255,255,255,.04); border-radius:10px;
-      padding: .875rem; border: 1px solid var(--border-l);
-    }
+    .mock-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--terra),var(--gold)); transition:width 1.5s ease; }
+    .mock-card { background:rgba(255,255,255,.04); border-radius:10px; padding:.875rem; border:1px solid var(--border-l); }
     .mock-card-tag { font-size:.65rem; font-weight:700; color:#EF4444; letter-spacing:.1em; margin-bottom:.4rem; }
-    .mock-card-title { color: var(--text); font-size:.825rem; font-weight:600; margin-bottom:.25rem; }
-    .mock-card-sub { color: var(--muted); font-size:.72rem; }
+    .mock-card-title { color:var(--text); font-size:.825rem; font-weight:600; margin-bottom:.25rem; }
+    .mock-card-sub { color:var(--muted); font-size:.72rem; }
 
-    /* ── SECTION WRAPPER ── */
-    .section { padding: 6rem clamp(1.5rem, 5vw, 4rem); }
+    /* ── SECTIONS ── */
+    .section { padding:6rem clamp(1.5rem,5vw,4rem); }
     .section-inner { max-width:1200px; margin:0 auto; }
-    .section-tag {
-      font-size:.7rem; font-weight:700; letter-spacing:.15em;
-      color: var(--terra-l); text-transform:uppercase;
-      margin-bottom:.75rem; display:block;
-    }
-    .section-h2 {
-      font-size: clamp(1.8rem, 3vw, 2.6rem);
-      font-weight:800; color: var(--text); line-height:1.2;
-      margin-bottom:1rem;
-    }
-    .section-lead {
-      font-size:1.125rem; color: var(--text-2); max-width:640px; line-height:1.75;
-    }
+    .section-tag { font-size:.7rem; font-weight:700; letter-spacing:.15em; color:var(--terra-l); text-transform:uppercase; margin-bottom:.75rem; display:block; }
+    .section-h2 { font-size:clamp(1.8rem,3vw,2.6rem); font-weight:800; color:var(--text); line-height:1.2; margin-bottom:1rem; }
+    .section-lead { font-size:1.125rem; color:var(--text-2); max-width:640px; line-height:1.75; }
 
     /* ── STATS BAND ── */
-    .stats-band {
-      background: var(--bg-3);
-      padding: 3.5rem clamp(1.5rem, 5vw, 4rem);
-      border-top: 1px solid var(--border-l);
-      border-bottom: 1px solid var(--border-l);
-    }
-    .stats-grid {
-      max-width:1200px; margin:0 auto;
-      display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-      gap:2rem; text-align:center;
-    }
-    .stat-num {
-      font-size:2.75rem; font-weight:900;
-      color: var(--text); line-height:1;
-      font-variant-numeric: tabular-nums;
-      font-family: 'Inter', sans-serif;
-    }
-    .stat-num .stat-suffix { color: var(--gold); }
-    .stat-label { font-size:.825rem; color: var(--muted); margin-top:.4rem; font-weight:500; }
+    .stats-band { background:var(--bg-3); padding:3.5rem clamp(1.5rem,5vw,4rem); border-top:1px solid var(--border-l); border-bottom:1px solid var(--border-l); }
+    .stats-grid { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:2rem; text-align:center; }
+    .stat-num { font-size:2.75rem; font-weight:900; color:var(--text); line-height:1; font-variant-numeric:tabular-nums; font-family:'Inter',sans-serif; }
+    .stat-num .stat-suffix { color:var(--gold); }
+    .stat-label { font-size:.825rem; color:var(--muted); margin-top:.4rem; font-weight:500; }
 
     /* ── TRUSTED BY ── */
-    .trusted {
-      background: var(--bg-2);
-      padding: 4rem clamp(1.5rem, 5vw, 4rem);
-      text-align: center;
-      border-top: 1px solid var(--border-l);
-      border-bottom: 1px solid var(--border-l);
-    }
-    .trusted-heading {
-      font-size:.8rem; font-weight:700; letter-spacing:.15em;
-      color: var(--muted); text-transform:uppercase; margin-bottom:2.5rem;
-      max-width:600px; margin-left:auto; margin-right:auto; line-height:1.7;
-    }
-    .trusted-logos {
-      display:flex; flex-wrap:wrap; justify-content:center;
-      align-items:center; gap:2rem; max-width:900px; margin:0 auto;
-    }
-    .trusted-logo-item {
-      background: var(--bg-card); border:1px solid var(--border);
-      border-radius:12px; padding:.875rem 1.75rem;
-      font-size:.8rem; font-weight:700; color: var(--muted);
-      letter-spacing:.05em; text-transform:uppercase;
-      transition: all .25s;
-    }
-    .trusted-logo-item:hover { border-color: var(--terra); color: var(--terra-l); transform:translateY(-2px); }
+    .trusted { background:var(--bg-2); padding:4rem clamp(1.5rem,5vw,4rem); text-align:center; border-top:1px solid var(--border-l); border-bottom:1px solid var(--border-l); }
+    .trusted-heading { font-size:.8rem; font-weight:700; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; margin-bottom:2.5rem; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.7; }
+    .trusted-logos { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:2rem; max-width:900px; margin:0 auto; }
+    .trusted-logo-item { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:.875rem 1.75rem; font-size:.8rem; font-weight:700; color:var(--muted); letter-spacing:.05em; text-transform:uppercase; transition:all .25s; }
+    .trusted-logo-item:hover { border-color:var(--terra); color:var(--terra-l); transform:translateY(-2px); }
 
     /* ── COMPARISON ── */
-    .comparison-grid {
-      display:grid; grid-template-columns:1fr 1fr;
-      gap:2rem; margin-top:2.5rem;
-    }
-    .comp-card {
-      border-radius:16px; padding:2rem; border:1px solid var(--border);
-    }
-    .comp-card.legacy {
-      background: var(--bg-card);
-    }
-    .comp-card.mewe-card {
-      background: linear-gradient(140deg, var(--terra-d) 0%, #1a2840 60%);
-      border: 1px solid rgba(155,107,74,.35);
-      box-shadow: 0 16px 48px rgba(155,107,74,.15);
-    }
-    .comp-label {
-      font-size:.7rem; font-weight:700; letter-spacing:.15em;
-      text-transform:uppercase; margin-bottom:1.25rem; display:block;
-    }
-    .comp-label.old { color: var(--muted); }
-    .comp-label.new { color: var(--gold); }
+    .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:2.5rem; }
+    .comp-card { border-radius:16px; padding:2rem; border:1px solid var(--border); }
+    .comp-card.legacy { background:var(--bg-card); }
+    .comp-card.mewe-card { background:linear-gradient(140deg,var(--terra-d) 0%,#1a2840 60%); border:1px solid rgba(155,107,74,.35); box-shadow:0 16px 48px rgba(155,107,74,.15); }
+    .comp-label { font-size:.7rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; margin-bottom:1.25rem; display:block; }
+    .comp-label.old { color:var(--muted); }
+    .comp-label.new { color:var(--gold); }
     .comp-title { font-size:1.25rem; font-weight:800; margin-bottom:1.5rem; }
-    .comp-card.legacy .comp-title { color: var(--text-2); }
-    .comp-card.mewe-card .comp-title { color: var(--text); }
+    .comp-card.legacy .comp-title { color:var(--text-2); }
+    .comp-card.mewe-card .comp-title { color:var(--text); }
     .comp-list { list-style:none; display:flex; flex-direction:column; gap:.75rem; }
-    .comp-item {
-      display:flex; gap:.75rem; align-items:flex-start;
-      font-size:.9rem; line-height:1.5;
-    }
-    .comp-card.legacy .comp-item { color: var(--muted); }
-    .comp-card.mewe-card .comp-item { color: rgba(240,237,232,.85); }
+    .comp-item { display:flex; gap:.75rem; align-items:flex-start; font-size:.9rem; line-height:1.5; }
+    .comp-card.legacy .comp-item { color:var(--muted); }
+    .comp-card.mewe-card .comp-item { color:rgba(240,237,232,.85); }
     .comp-icon { font-size:1rem; flex-shrink:0; margin-top:.1rem; }
 
     /* ── FEATURES ── */
-    .features-grid {
-      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
-      gap:1.5rem; margin-top:2.5rem;
-    }
-    .feature-card {
-      background: var(--bg-card); border-radius:14px;
-      padding:1.75rem; border:1px solid var(--border);
-      transition: all .3s; cursor:default;
-    }
-    .feature-card:hover {
-      transform:translateY(-5px);
-      box-shadow:0 20px 48px rgba(0,0,0,.4);
-      border-color: rgba(155,107,74,.35);
-      background: var(--bg-card-h);
-    }
-    .feature-icon {
-      width:44px; height:44px; border-radius:10px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.25rem; margin-bottom:1rem;
-      background: linear-gradient(135deg, rgba(155,107,74,.2), rgba(201,169,110,.1));
-      border: 1px solid rgba(155,107,74,.2);
-    }
-    .feature-title { font-size:1rem; font-weight:700; color: var(--text); margin-bottom:.5rem; }
-    .feature-desc { font-size:.875rem; color: var(--text-2); line-height:1.65; }
-    .feature-metric { font-size:.75rem; font-weight:700; color: var(--green); margin-top:.75rem; }
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:2.5rem; }
+    .feature-card { background:var(--bg-card); border-radius:14px; padding:1.75rem; border:1px solid var(--border); transition:all .3s; }
+    .feature-card:hover { transform:translateY(-5px); box-shadow:0 20px 48px rgba(0,0,0,.4); border-color:rgba(155,107,74,.35); background:var(--bg-card-h); }
+    .feature-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin-bottom:1rem; background:linear-gradient(135deg,rgba(155,107,74,.2),rgba(201,169,110,.1)); border:1px solid rgba(155,107,74,.2); }
+    .feature-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.5rem; }
+    .feature-desc { font-size:.875rem; color:var(--text-2); line-height:1.65; }
+    .feature-metric { font-size:.75rem; font-weight:700; color:var(--green); margin-top:.75rem; }
 
-    /* ── HOW IT WORKS ── */
+    /* ── STEPS ── */
     .steps { display:flex; flex-direction:column; gap:1.5rem; margin-top:2.5rem; }
-    .step {
-      display:flex; gap:1.5rem; align-items:flex-start;
-      padding:1.5rem; border-radius:14px;
-      border:1px solid var(--border); background: var(--bg-card);
-      transition: all .3s;
-    }
-    .step:hover { box-shadow:0 8px 32px rgba(0,0,0,.35); border-color: rgba(155,107,74,.3); }
-    .step-num {
-      width:40px; height:40px; border-radius:10px; flex-shrink:0;
-      background: var(--terra); color: var(--text);
-      display:flex; align-items:center; justify-content:center;
-      font-size:.875rem; font-weight:800;
-    }
-    .step-title { font-size:1rem; font-weight:700; color: var(--text); margin-bottom:.35rem; }
-    .step-desc { font-size:.875rem; color: var(--text-2); line-height:1.6; }
+    .step { display:flex; gap:1.5rem; align-items:flex-start; padding:1.5rem; border-radius:14px; border:1px solid var(--border); background:var(--bg-card); transition:all .3s; }
+    .step:hover { box-shadow:0 8px 32px rgba(0,0,0,.35); border-color:rgba(155,107,74,.3); }
+    .step-num { width:40px; height:40px; border-radius:10px; flex-shrink:0; background:var(--terra); color:var(--text); display:flex; align-items:center; justify-content:center; font-size:.875rem; font-weight:800; }
+    .step-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.35rem; }
+    .step-desc { font-size:.875rem; color:var(--text-2); line-height:1.6; }
 
     /* ── PRICING ── */
-    .pricing-grid {
-      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
-      gap:1.5rem; margin-top:2.5rem;
-    }
-    .price-card {
-      border-radius:16px; padding:2rem;
-      border:1px solid var(--border);
-      transition: all .3s; position:relative; overflow:hidden;
-    }
+    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:2.5rem; }
+    .price-card { border-radius:16px; padding:2rem; border:1px solid var(--border); transition:all .3s; position:relative; overflow:hidden; }
     .price-card:hover { transform:translateY(-4px); }
-    .price-card.starter { background: var(--bg-card); }
-    .price-card.pro {
-      background: linear-gradient(150deg, #16222E 0%, #1C1408 100%);
-      border: 1px solid rgba(201,169,110,.3);
-      box-shadow: 0 24px 64px rgba(155,107,74,.2);
-    }
-    .price-card.enterprise { background: var(--bg-card); border-color: rgba(96,165,250,.2); }
-    .price-badge {
-      position:absolute; top:1.25rem; right:1.25rem;
-      font-size:.65rem; font-weight:700; letter-spacing:.1em;
-      padding:.3rem .75rem; border-radius:20px; text-transform:uppercase;
-    }
-    .price-badge.recommended {
-      background: var(--terra); color: var(--text);
-    }
+    .price-card.starter { background:var(--bg-card); }
+    .price-card.pro { background:linear-gradient(150deg,#16222E 0%,#1C1408 100%); border:1px solid rgba(201,169,110,.3); box-shadow:0 24px 64px rgba(155,107,74,.2); }
+    .price-card.enterprise { background:var(--bg-card); border-color:rgba(96,165,250,.2); }
+    .price-badge { position:absolute; top:1.25rem; right:1.25rem; font-size:.65rem; font-weight:700; letter-spacing:.1em; padding:.3rem .75rem; border-radius:20px; text-transform:uppercase; }
+    .price-badge.recommended { background:var(--terra); color:var(--text); }
     .price-name { font-size:.75rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; margin-bottom:.75rem; }
-    .price-card.starter .price-name { color: var(--muted); }
-    .price-card.pro .price-name { color: var(--gold); }
-    .price-card.enterprise .price-name { color: var(--blue); }
-    .price-amount {
-      font-size:3rem; font-weight:900; line-height:1;
-      margin-bottom:.25rem; font-family: 'Inter', sans-serif;
-    }
-    .price-card.starter .price-amount { color: var(--text); }
-    .price-card.pro .price-amount { color: var(--gold-l); }
-    .price-card.enterprise .price-amount { color: var(--text); }
-    .price-period { font-size:.875rem; color: var(--muted); margin-bottom:1.5rem; }
-    .price-card.pro .price-period { color: rgba(240,237,232,.45); }
-    .price-divider { height:1px; background: var(--border); margin:1.5rem 0; }
-    .price-card.pro .price-divider { background: rgba(201,169,110,.2); }
+    .price-card.starter .price-name { color:var(--muted); }
+    .price-card.pro .price-name { color:var(--gold); }
+    .price-card.enterprise .price-name { color:var(--blue); }
+    .price-amount { font-size:3rem; font-weight:900; line-height:1; margin-bottom:.25rem; font-family:'Inter',sans-serif; }
+    .price-card.starter .price-amount { color:var(--text); }
+    .price-card.pro .price-amount { color:var(--gold-l); }
+    .price-card.enterprise .price-amount { color:var(--text); }
+    .price-period { font-size:.875rem; color:var(--muted); margin-bottom:1.5rem; }
+    .price-card.pro .price-period { color:rgba(240,237,232,.45); }
+    .price-divider { height:1px; background:var(--border); margin:1.5rem 0; }
+    .price-card.pro .price-divider { background:rgba(201,169,110,.2); }
     .price-features { list-style:none; display:flex; flex-direction:column; gap:.7rem; margin-bottom:2rem; }
     .price-feature { display:flex; gap:.6rem; font-size:.875rem; align-items:flex-start; }
-    .price-card.starter .price-feature { color: var(--text-2); }
-    .price-card.pro .price-feature { color: rgba(240,237,232,.85); }
-    .price-card.enterprise .price-feature { color: var(--text-2); }
-    .price-check { color: var(--green); font-weight:700; flex-shrink:0; }
-    .price-card.pro .price-check { color: var(--gold); }
-    .price-cta {
-      width:100%; padding:.875rem; border-radius:10px;
-      font-size:.9rem; font-weight:700; cursor:pointer;
-      text-align:center; text-decoration:none; display:block; transition:all .25s;
-    }
-    .price-cta.starter-cta {
-      background: var(--bg-card-h); color: var(--text-2);
-      border:1.5px solid var(--border);
-    }
-    .price-cta.starter-cta:hover { background: var(--terra); color: var(--text); border-color: var(--terra); }
-    .price-cta.pro-cta {
-      background: var(--terra); color: var(--text); border:none;
-      box-shadow: 0 4px 20px rgba(155,107,74,.4);
-    }
-    .price-cta.pro-cta:hover { background: var(--terra-l); transform:translateY(-1px); box-shadow: 0 6px 28px rgba(155,107,74,.55); }
-    .price-cta.enterprise-cta {
-      background: rgba(96,165,250,.12); color: var(--blue); border:1.5px solid rgba(96,165,250,.25);
-    }
-    .price-cta.enterprise-cta:hover { background: rgba(96,165,250,.2); }
-    .pricing-note {
-      text-align:center; margin-top:1.5rem;
-      font-size:.875rem; color: var(--muted); font-style:italic;
-    }
-    .pricing-note strong { color: var(--text-2); }
-
-    /* ── TESTIMONIALS ── */
-    .testimonials-grid {
-      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
-      gap:1.5rem; margin-top:2.5rem;
-    }
-    .testimonial {
-      background: var(--bg-card); border-radius:14px;
-      padding:1.75rem; border:1px solid var(--border);
-      transition:all .3s;
-    }
-    .testimonial:hover { transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,.4); border-color: rgba(155,107,74,.25); }
-    .testimonial-quote { font-size:.95rem; color: var(--text-2); line-height:1.75; margin-bottom:1.25rem; font-style:italic; }
-    .testimonial-author { display:flex; gap:.75rem; align-items:center; }
-    .author-avatar {
-      width:40px; height:40px; border-radius:50%;
-      background:linear-gradient(135deg, var(--terra-d), var(--gold));
-      display:flex; align-items:center; justify-content:center;
-      font-weight:800; color: var(--text); font-size:.875rem; flex-shrink:0;
-    }
-    .author-name { font-size:.875rem; font-weight:700; color: var(--text); }
-    .author-role { font-size:.75rem; color: var(--muted); }
-    .stars { color: var(--gold); font-size:.8rem; margin-bottom:.75rem; }
+    .price-card.starter .price-feature { color:var(--text-2); }
+    .price-card.pro .price-feature { color:rgba(240,237,232,.85); }
+    .price-card.enterprise .price-feature { color:var(--text-2); }
+    .price-check { color:var(--green); font-weight:700; flex-shrink:0; }
+    .price-card.pro .price-check { color:var(--gold); }
+    .price-cta { width:100%; padding:.875rem; border-radius:10px; font-size:.9rem; font-weight:700; cursor:pointer; text-align:center; text-decoration:none; display:block; transition:all .25s; }
+    .price-cta.starter-cta { background:var(--bg-card-h); color:var(--text-2); border:1.5px solid var(--border); }
+    .price-cta.starter-cta:hover { background:var(--terra); color:var(--text); border-color:var(--terra); }
+    .price-cta.pro-cta { background:var(--terra); color:var(--text); border:none; box-shadow:0 4px 20px rgba(155,107,74,.4); }
+    .price-cta.pro-cta:hover { background:var(--terra-l); transform:translateY(-1px); }
+    .price-cta.enterprise-cta { background:rgba(96,165,250,.12); color:var(--blue); border:1.5px solid rgba(96,165,250,.25); }
+    .price-cta.enterprise-cta:hover { background:rgba(96,165,250,.2); }
+    .pricing-note { text-align:center; margin-top:1.5rem; font-size:.875rem; color:var(--muted); font-style:italic; }
+    .pricing-note strong { color:var(--text-2); }
 
     /* ── FAQ ── */
     .faq-list { max-width:720px; margin:2.5rem auto 0; display:flex; flex-direction:column; gap:1px; }
-    details {
-      border:1px solid var(--border); border-radius:12px;
-      overflow:hidden; margin-bottom:.5rem;
-      background: var(--bg-card); transition:all .2s;
-    }
-    details[open] { box-shadow:0 4px 24px rgba(0,0,0,.3); border-color: rgba(155,107,74,.25); }
-    summary {
-      padding:1.25rem 1.5rem; font-weight:600; font-size:.95rem;
-      cursor:pointer; color: var(--text);
-      display:flex; justify-content:space-between; align-items:center;
-      list-style:none;
-    }
+    details { border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:.5rem; background:var(--bg-card); transition:all .2s; }
+    details[open] { box-shadow:0 4px 24px rgba(0,0,0,.3); border-color:rgba(155,107,74,.25); }
+    summary { padding:1.25rem 1.5rem; font-weight:600; font-size:.95rem; cursor:pointer; color:var(--text); display:flex; justify-content:space-between; align-items:center; list-style:none; }
     summary::-webkit-details-marker { display:none; }
-    summary::after {
-      content:'↓'; font-size:.8rem; color: var(--muted);
-      transition:transform .3s; flex-shrink:0; margin-left:1rem;
-    }
+    summary::after { content:'↓'; font-size:.8rem; color:var(--muted); transition:transform .3s; flex-shrink:0; margin-left:1rem; }
     details[open] summary::after { transform:rotate(180deg); }
-    details[open] summary { color: var(--gold); }
-    .faq-answer { padding:0 1.5rem 1.25rem; font-size:.9rem; color: var(--muted); line-height:1.75; }
+    details[open] summary { color:var(--gold); }
+    .faq-answer { padding:0 1.5rem 1.25rem; font-size:.9rem; color:var(--muted); line-height:1.75; }
 
     /* ── GUARANTEE ── */
-    .guarantee {
-      background: linear-gradient(135deg, rgba(155,107,74,.08), rgba(201,169,110,.05));
-      border-radius:20px;
-      padding:3rem; text-align:center; margin-top:2.5rem;
-      border:1px solid rgba(155,107,74,.2);
-    }
+    .guarantee { background:linear-gradient(135deg,rgba(155,107,74,.08),rgba(201,169,110,.05)); border-radius:20px; padding:3rem; text-align:center; margin-top:2.5rem; border:1px solid rgba(155,107,74,.2); }
     .guarantee-icon { font-size:2.5rem; margin-bottom:.75rem; }
-    .guarantee h3 { font-size:1.4rem; font-weight:800; color: var(--text); margin-bottom:.75rem; }
-    .guarantee p { font-size:.95rem; color: var(--text-2); max-width:520px; margin:0 auto; line-height:1.75; }
+    .guarantee h3 { font-size:1.4rem; font-weight:800; color:var(--text); margin-bottom:.75rem; }
+    .guarantee p { font-size:.95rem; color:var(--text-2); max-width:520px; margin:0 auto; line-height:1.75; }
 
     /* ── FINAL CTA ── */
-    .cta-section {
-      background: var(--bg-3);
-      padding:6rem clamp(1.5rem, 5vw, 4rem);
-      text-align:center;
-      border-top: 1px solid var(--border-l);
-      position: relative; overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(155,107,74,.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .cta-section h2 { font-size:clamp(1.8rem, 3.5vw, 2.8rem); font-weight:900; color: var(--text); margin-bottom:1rem; position:relative; }
-    .cta-section p { font-size:1.1rem; color: var(--text-2); margin-bottom:2.5rem; max-width:560px; margin-left:auto; margin-right:auto; line-height:1.7; position:relative; }
+    .cta-section { background:var(--bg-3); padding:6rem clamp(1.5rem,5vw,4rem); text-align:center; border-top:1px solid var(--border-l); position:relative; overflow:hidden; }
+    .cta-section::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(155,107,74,.1) 0%,transparent 70%); pointer-events:none; }
+    .cta-section h2 { font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:900; color:var(--text); margin-bottom:1rem; position:relative; }
+    .cta-section p { font-size:1.1rem; color:var(--text-2); margin-bottom:2.5rem; max-width:560px; margin-left:auto; margin-right:auto; line-height:1.7; position:relative; }
     .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; position:relative; }
-    .btn-cta-terra {
-      padding:.875rem 2rem; border-radius:10px;
-      background: var(--terra); color: var(--text); font-weight:700;
-      text-decoration:none; transition:all .25s;
-      font-size:.95rem;
-      box-shadow: 0 4px 24px rgba(155,107,74,.4);
-    }
-    .btn-cta-terra:hover { background: var(--terra-l); transform:translateY(-2px); box-shadow: 0 8px 32px rgba(155,107,74,.55); }
-    .btn-cta-outline {
-      padding:.875rem 2rem; border-radius:10px;
-      background:transparent; color: var(--text-2);
-      border:1.5px solid var(--border); font-weight:700;
-      text-decoration:none; transition:all .25s; font-size:.95rem;
-    }
-    .btn-cta-outline:hover { border-color: var(--terra); color: var(--text); }
+    .btn-cta-terra { padding:.875rem 2rem; border-radius:10px; background:var(--terra); color:var(--text); font-weight:700; text-decoration:none; transition:all .25s; font-size:.95rem; box-shadow:0 4px 24px rgba(155,107,74,.4); }
+    .btn-cta-terra:hover { background:var(--terra-l); transform:translateY(-2px); }
+    .btn-cta-outline { padding:.875rem 2rem; border-radius:10px; background:transparent; color:var(--text-2); border:1.5px solid var(--border); font-weight:700; text-decoration:none; transition:all .25s; font-size:.95rem; }
+    .btn-cta-outline:hover { border-color:var(--terra); color:var(--text); }
 
     /* ── FOOTER ── */
-    footer {
-      background: var(--bg-3); border-top:1px solid var(--border-l);
-      padding:2rem clamp(1.5rem, 5vw, 4rem);
-    }
-    .footer-inner {
-      max-width:1200px; margin:0 auto;
-      display:flex; justify-content:space-between; align-items:center;
-      flex-wrap:wrap; gap:1rem;
-    }
-    .footer-logo { color: var(--text); font-weight:900; letter-spacing:.15em; font-size:1rem; }
-    .footer-copy { font-size:.8rem; color: var(--muted); }
+    footer { background:var(--bg-3); border-top:1px solid var(--border-l); padding:2rem clamp(1.5rem,5vw,4rem); }
+    .footer-inner { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+    .footer-logo { color:var(--text); font-weight:900; letter-spacing:.15em; font-size:1rem; }
+    .footer-copy { font-size:.8rem; color:var(--muted); }
 
-    /* ── SCROLL REVEAL ── */
+    /* ── REVEAL ── */
     .reveal { opacity:0; transform:translateY(30px); }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
+    @media (max-width:768px) {
       .hero { grid-template-columns:1fr; gap:2.5rem; }
       .comparison-grid { grid-template-columns:1fr; }
       .nav-links { display:none; }
+      .lang-toggle .lang-label { display:none; }
     }
+
+    /* ── CONTENT HIDDEN BY LANG ── */
+    [data-es], [data-en] { display:inherit; }
+    html[data-lang="es"] [data-en] { display:none !important; }
+    html[data-lang="en"] [data-es] { display:none !important; }
   </style>
 </head>
 <body>
@@ -553,21 +301,34 @@
 <!-- ═══════════ NAV ═══════════ -->
 <nav>
   <div class="nav-inner">
+    <!-- LOGO: cuando tengas el archivo, cambia esto por <img src="img/mewe-logo.svg" class="logo-img" alt="MeWe Academy"> -->
     <a href="#" class="logo-placeholder">
-      <!-- LOGO PLACEHOLDER: reemplaza con <img src="img/mewe-logo.svg"> cuando tengas el logo -->
-      <div style="display:flex;flex-direction:column;gap:2px;">
+      <div class="logo-img-fallback">
         <span class="logo-mewe">MEWE</span>
         <span class="logo-sub">Academy</span>
       </div>
     </a>
+
     <ul class="nav-links">
-      <li><a href="#para-quien">¿Para quién?</a></li>
-      <li><a href="#funciones">Funciones</a></li>
-      <li><a href="#precios">Precios</a></li>
+      <li><a href="#para-quien"><span data-es>¿Para quién?</span><span data-en>Who's it for?</span></a></li>
+      <li><a href="#funciones"><span data-es>Funciones</span><span data-en>Features</span></a></li>
+      <li><a href="#precios"><span data-es>Precios</span><span data-en>Pricing</span></a></li>
     </ul>
-    <div class="nav-ctas">
-      <a href="#precios" class="btn-ghost">Ver demo</a>
-      <a href="#precios" class="btn-primary">Solicitar demo →</a>
+
+    <div class="nav-right">
+      <!-- LANGUAGE TOGGLE -->
+      <div class="lang-toggle">
+        <button class="lang-btn" id="btn-es" onclick="setLang('es')">
+          <span class="flag">🇲🇽</span>
+          <span class="lang-label">ES</span>
+        </button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">
+          <span class="flag">🇺🇸</span>
+          <span class="lang-label">EN</span>
+        </button>
+      </div>
+      <a href="#precios" class="btn-ghost"><span data-es>Ver demo</span><span data-en>See demo</span></a>
+      <a href="#precios" class="btn-primary"><span data-es>Solicitar demo →</span><span data-en>Request demo →</span></a>
     </div>
   </div>
 </nav>
@@ -576,65 +337,83 @@
 <section style="max-width:1200px;margin:0 auto;padding:6rem clamp(1.5rem,5vw,4rem) 4rem;">
   <div class="hero" style="max-width:100%;margin:0;padding:0;">
     <div class="hero-content">
-      <span class="hero-category">EL SISTEMA OPERATIVO DEL CONOCIMIENTO ORGANIZACIONAL</span>
-      <span class="hero-eyebrow">🧠 BASADO EN NEUROCIENCIA DEL APRENDIZAJE</span>
+      <span class="hero-category">
+        <span data-es>EL SISTEMA OPERATIVO DEL CONOCIMIENTO ORGANIZACIONAL</span>
+        <span data-en>THE OPERATING SYSTEM FOR ORGANIZATIONAL KNOWLEDGE</span>
+      </span>
+      <span class="hero-eyebrow">
+        🧠 <span data-es>BASADO EN NEUROCIENCIA DEL APRENDIZAJE</span><span data-en>LEARNING NEUROSCIENCE-BASED</span>
+      </span>
       <h1>
-        El <span class="accent">70% de lo que tu equipo aprende hoy</span>,
-        lo olvidará en 48 horas.
+        <span data-es>El <span class="accent">70% de lo que tu equipo aprende hoy</span>, lo olvidará en 48 horas.</span>
+        <span data-en>Your team will forget <span class="accent">70% of what they learn today</span> within 48 hours.</span>
       </h1>
       <p class="hero-subtitle">
-        MeWe Academy es la plataforma de entrenamiento que tu organización administra
-        con su nombre, su identidad y sus reglas.
+        <span data-es>MeWe Academy es la plataforma de entrenamiento que tu organización administra con su nombre, su identidad y sus reglas.</span>
+        <span data-en>MeWe Academy is the training platform your organization runs under its own name, identity, and rules.</span>
       </p>
-      <p class="hero-tagline">Donde el aprendizaje deja de ser contenido… y se convierte en infraestructura.</p>
+      <p class="hero-tagline">
+        <span data-es>Donde el aprendizaje deja de ser contenido… y se convierte en infraestructura.</span>
+        <span data-en>Where learning stops being content… and becomes infrastructure.</span>
+      </p>
       <div class="hero-btns">
-        <a href="#precios" class="btn-hero btn-hero-primary">Solicitar demo gratuita →</a>
-        <a href="#funciones" class="btn-hero btn-hero-outline">Ver funciones</a>
+        <a href="#precios" class="btn-hero btn-hero-primary">
+          <span data-es>Solicitar demo gratuita →</span>
+          <span data-en>Request free demo →</span>
+        </a>
+        <a href="#funciones" class="btn-hero btn-hero-outline">
+          <span data-es>Ver funciones</span>
+          <span data-en>See features</span>
+        </a>
       </div>
     </div>
+
     <div class="dashboard-mock hero-mock">
       <div class="mock-bar">
         <span class="mock-dot" style="background:#EF4444;"></span>
         <span class="mock-dot" style="background:#F59E0B;"></span>
         <span class="mock-dot" style="background:#34D399;"></span>
-        <span class="mock-title">MeWe Academy — Panel del Maestro</span>
-        <span class="mock-live">● En vivo</span>
+        <span class="mock-title">
+          <span data-es>MeWe Academy — Panel del Maestro</span>
+          <span data-en>MeWe Academy — Teacher Dashboard</span>
+        </span>
+        <span class="mock-live">● <span data-es>En vivo</span><span data-en>Live</span></span>
       </div>
       <div class="mock-body">
         <div class="mock-chips">
-          <span class="chip chip-blue">📚 12 cursos activos</span>
-          <span class="chip chip-green">✓ 247 alumnos</span>
-          <span class="chip chip-amber">🎓 18 certificados</span>
+          <span class="chip chip-blue">📚 <span data-es>12 cursos activos</span><span data-en>12 active courses</span></span>
+          <span class="chip chip-green">✓ 247 <span data-es>alumnos</span><span data-en>students</span></span>
+          <span class="chip chip-amber">🎓 18 <span data-es>certificados</span><span data-en>certificates</span></span>
         </div>
         <div style="display:flex;flex-direction:column;gap:.6rem;">
           <div class="mock-metric">
-            <span>Retención de conocimiento</span>
-            <span class="metric-val counter" data-target="91">0</span><span class="metric-val">%</span>
+            <span data-es>Retención de conocimiento</span><span data-en>Knowledge retention</span>
+            <span><span class="metric-val counter" data-target="91">0</span><span class="metric-val">%</span></span>
           </div>
           <div class="mock-bar-wrap"><div class="mock-bar-fill" style="width:91%"></div></div>
           <div class="mock-metric">
-            <span>Cursos completados este mes</span>
+            <span data-es>Cursos completados este mes</span><span data-en>Courses completed this month</span>
             <span class="metric-val counter" data-target="34">0</span>
           </div>
           <div class="mock-metric">
-            <span>Alumnos activos hoy</span>
+            <span data-es>Alumnos activos hoy</span><span data-en>Active students today</span>
             <span class="metric-val counter" data-target="62">0</span>
           </div>
           <div class="mock-metric">
-            <span>Programa de Liderazgo Q1</span>
+            <span data-es>Programa de Liderazgo Q1</span><span data-en>Leadership Program Q1</span>
             <span class="metric-val">78%</span>
           </div>
           <div class="mock-bar-wrap"><div class="mock-bar-fill" style="width:78%"></div></div>
           <div class="mock-metric">
-            <span>Inducción Nuevos Colaboradores</span>
+            <span data-es>Inducción Nuevos Colaboradores</span><span data-en>New Employee Onboarding</span>
             <span class="metric-val">100%</span>
           </div>
           <div class="mock-bar-wrap"><div class="mock-bar-fill" style="width:100%"></div></div>
         </div>
         <div class="mock-card">
-          <div class="mock-card-tag">● CLASE EN VIVO AHORA</div>
-          <div class="mock-card-title">Ventas Consultivas — Módulo 3</div>
-          <div class="mock-card-sub">28 alumnos conectados · 42 min restantes</div>
+          <div class="mock-card-tag">● <span data-es>CLASE EN VIVO AHORA</span><span data-en>LIVE CLASS NOW</span></div>
+          <div class="mock-card-title"><span data-es>Ventas Consultivas — Módulo 3</span><span data-en>Consultative Sales — Module 3</span></div>
+          <div class="mock-card-sub"><span data-es>28 alumnos conectados · 42 min restantes</span><span data-en>28 students connected · 42 min remaining</span></div>
         </div>
       </div>
     </div>
@@ -646,19 +425,19 @@
   <div class="stats-grid">
     <div class="reveal">
       <div class="stat-num"><span class="counter" data-target="38">0</span><span class="stat-suffix">%</span></div>
-      <div class="stat-label">Mayor retención vs. plataformas tradicionales</div>
+      <div class="stat-label"><span data-es>Mayor retención vs. plataformas tradicionales</span><span data-en>Higher retention vs. traditional LMS</span></div>
     </div>
     <div class="reveal">
-      <div class="stat-num"><span class="counter" data-target="6">0</span><span class="stat-suffix"> sem</span></div>
-      <div class="stat-label">Promedio de implementación completa</div>
+      <div class="stat-num"><span class="counter" data-target="6">0</span><span class="stat-suffix"> <span data-es>sem</span><span data-en>wks</span></span></div>
+      <div class="stat-label"><span data-es>Promedio de implementación completa</span><span data-en>Average full implementation time</span></div>
     </div>
     <div class="reveal">
       <div class="stat-num"><span class="counter" data-target="100">0</span><span class="stat-suffix">%</span></div>
-      <div class="stat-label">White-label: tu marca, tu dominio</div>
+      <div class="stat-label"><span data-es>White-label: tu marca, tu dominio</span><span data-en>White-label: your brand, your domain</span></div>
     </div>
     <div class="reveal">
       <div class="stat-num"><span class="counter" data-target="3">0</span><span class="stat-suffix">x</span></div>
-      <div class="stat-label">Más participación vs. video estático</div>
+      <div class="stat-label"><span data-es>Más participación vs. video estático</span><span data-en>More engagement vs. static video</span></div>
     </div>
   </div>
 </div>
@@ -666,47 +445,54 @@
 <!-- ═══════════ TRUSTED BY ═══════════ -->
 <div class="trusted reveal">
   <p class="trusted-heading">
-    Confiado por organizaciones que entienden que el conocimiento es su ventaja competitiva.
+    <span data-es>Confiado por organizaciones que entienden que el conocimiento es su ventaja competitiva.</span>
+    <span data-en>Trusted by organizations that understand knowledge is their competitive advantage.</span>
   </p>
   <div class="trusted-logos">
-    <div class="trusted-logo-item">Su empresa aquí</div>
-    <div class="trusted-logo-item">Organización líder</div>
-    <div class="trusted-logo-item">Corporativo</div>
-    <div class="trusted-logo-item">Universidad</div>
-    <div class="trusted-logo-item">Franquicia</div>
+    <div class="trusted-logo-item"><span data-es>Su empresa aquí</span><span data-en>Your company here</span></div>
+    <div class="trusted-logo-item"><span data-es>Organización líder</span><span data-en>Leading org</span></div>
+    <div class="trusted-logo-item"><span data-es>Corporativo</span><span data-en>Corporate</span></div>
+    <div class="trusted-logo-item"><span data-es>Universidad</span><span data-en>University</span></div>
+    <div class="trusted-logo-item"><span data-es>Franquicia</span><span data-en>Franchise</span></div>
   </div>
-  <p style="margin-top:1.5rem;font-size:.8rem;color:var(--muted);">Más de 50 organizaciones ya transformaron su entrenamiento con MeWe Academy.</p>
+  <p style="margin-top:1.5rem;font-size:.8rem;color:var(--muted);">
+    <span data-es>Más de 50 organizaciones ya transformaron su entrenamiento con MeWe Academy.</span>
+    <span data-en>Over 50 organizations have already transformed their training with MeWe Academy.</span>
+  </p>
 </div>
 
 <!-- ═══════════ COMPARISON ═══════════ -->
 <section class="section" id="para-quien">
   <div class="section-inner">
-    <span class="section-tag reveal">Por qué cambiar</span>
-    <h2 class="section-h2 reveal">LMS Tradicional vs. MeWe Academy</h2>
-    <p class="section-lead reveal">No es solo otra herramienta de cursos. Es la diferencia entre guardar contenido y construir conocimiento.</p>
+    <span class="section-tag reveal"><span data-es>Por qué cambiar</span><span data-en>Why switch</span></span>
+    <h2 class="section-h2 reveal"><span data-es>LMS Tradicional vs. MeWe Academy</span><span data-en>Traditional LMS vs. MeWe Academy</span></h2>
+    <p class="section-lead reveal">
+      <span data-es>No es solo otra herramienta de cursos. Es la diferencia entre guardar contenido y construir conocimiento.</span>
+      <span data-en>It's not just another course tool. It's the difference between storing content and building knowledge.</span>
+    </p>
     <div class="comparison-grid reveal">
       <div class="comp-card legacy">
-        <span class="comp-label old">⚠ LMS Tradicional</span>
-        <div class="comp-title">Aprendizaje estático y desconectado</div>
+        <span class="comp-label old">⚠ <span data-es>LMS Tradicional</span><span data-en>Traditional LMS</span></span>
+        <div class="comp-title"><span data-es>Aprendizaje estático y desconectado</span><span data-en>Static, disconnected learning</span></div>
         <ul class="comp-list">
-          <li class="comp-item"><span class="comp-icon">✕</span> Cursos estáticos que nadie termina</li>
-          <li class="comp-item"><span class="comp-icon">✕</span> Baja participación y engagement</li>
-          <li class="comp-item"><span class="comp-icon">✕</span> Herramientas fragmentadas</li>
-          <li class="comp-item"><span class="comp-icon">✕</span> Sin analytics de comportamiento real</li>
-          <li class="comp-item"><span class="comp-icon">✕</span> Marca de la plataforma, no la tuya</li>
-          <li class="comp-item"><span class="comp-icon">✕</span> Difícil de mantener actualizado</li>
+          <li class="comp-item"><span class="comp-icon">✕</span> <span data-es>Cursos estáticos que nadie termina</span><span data-en>Static courses nobody finishes</span></li>
+          <li class="comp-item"><span class="comp-icon">✕</span> <span data-es>Baja participación y engagement</span><span data-en>Low participation and engagement</span></li>
+          <li class="comp-item"><span class="comp-icon">✕</span> <span data-es>Herramientas fragmentadas</span><span data-en>Fragmented tools</span></li>
+          <li class="comp-item"><span class="comp-icon">✕</span> <span data-es>Sin analytics de comportamiento real</span><span data-en>No real behavioral analytics</span></li>
+          <li class="comp-item"><span class="comp-icon">✕</span> <span data-es>Marca de la plataforma, no la tuya</span><span data-en>Platform brand, not yours</span></li>
+          <li class="comp-item"><span class="comp-icon">✕</span> <span data-es>Difícil de mantener actualizado</span><span data-en>Hard to keep updated</span></li>
         </ul>
       </div>
       <div class="comp-card mewe-card">
         <span class="comp-label new">✦ MeWe Academy</span>
-        <div class="comp-title">Infraestructura de conocimiento vivo</div>
+        <div class="comp-title"><span data-es>Infraestructura de conocimiento vivo</span><span data-en>Living knowledge infrastructure</span></div>
         <ul class="comp-list">
-          <li class="comp-item"><span class="comp-icon">✓</span> Aprendizaje en vivo + presentaciones interactivas</li>
-          <li class="comp-item"><span class="comp-icon">✓</span> Contenido vertical mobile-first (como TikTok)</li>
-          <li class="comp-item"><span class="comp-icon">✓</span> Sistema de aprendizaje unificado</li>
-          <li class="comp-item"><span class="comp-icon">✓</span> Analytics de retención y comportamiento</li>
-          <li class="comp-item"><span class="comp-icon">✓</span> 100% white-label con tu marca</li>
-          <li class="comp-item"><span class="comp-icon">✓</span> Exámenes, certificados y seguimiento real</li>
+          <li class="comp-item"><span class="comp-icon">✓</span> <span data-es>Aprendizaje en vivo + presentaciones interactivas</span><span data-en>Live learning + interactive presentations</span></li>
+          <li class="comp-item"><span class="comp-icon">✓</span> <span data-es>Contenido vertical mobile-first (como TikTok)</span><span data-en>Vertical mobile-first content (like TikTok)</span></li>
+          <li class="comp-item"><span class="comp-icon">✓</span> <span data-es>Sistema de aprendizaje unificado</span><span data-en>Unified learning system</span></li>
+          <li class="comp-item"><span class="comp-icon">✓</span> <span data-es>Analytics de retención y comportamiento</span><span data-en>Retention & behavior analytics</span></li>
+          <li class="comp-item"><span class="comp-icon">✓</span> <span data-es>100% white-label con tu marca</span><span data-en>100% white-label with your brand</span></li>
+          <li class="comp-item"><span class="comp-icon">✓</span> <span data-es>Exámenes, certificados y seguimiento real</span><span data-en>Exams, certificates & real tracking</span></li>
         </ul>
       </div>
     </div>
@@ -716,57 +502,57 @@
 <!-- ═══════════ FEATURES ═══════════ -->
 <section class="section" id="funciones" style="background:var(--bg-2);">
   <div class="section-inner">
-    <span class="section-tag reveal">Funciones</span>
-    <h2 class="section-h2 reveal">Todo lo que necesitas. Nada de lo que no.</h2>
-    <p class="section-lead reveal">Diseñado para organizaciones que toman el entrenamiento en serio.</p>
+    <span class="section-tag reveal"><span data-es>Funciones</span><span data-en>Features</span></span>
+    <h2 class="section-h2 reveal"><span data-es>Todo lo que necesitas. Nada de lo que no.</span><span data-en>Everything you need. Nothing you don't.</span></h2>
+    <p class="section-lead reveal"><span data-es>Diseñado para organizaciones que toman el entrenamiento en serio.</span><span data-en>Built for organizations that take training seriously.</span></p>
     <div class="features-grid">
       <div class="feature-card reveal">
         <div class="feature-icon">🎬</div>
-        <div class="feature-title">Video Vertical TikTok-Style</div>
-        <div class="feature-desc">Feed de contenido formativo en formato vertical. Tus colaboradores aprenden en el formato que ya dominan.</div>
-        <div class="feature-metric">↑ 3x más visualizaciones que video horizontal</div>
+        <div class="feature-title"><span data-es>Video Vertical TikTok-Style</span><span data-en>TikTok-Style Vertical Video</span></div>
+        <div class="feature-desc"><span data-es>Feed de contenido formativo en formato vertical. Tus colaboradores aprenden en el formato que ya dominan.</span><span data-en>Vertical training content feed. Your team learns in the format they already know.</span></div>
+        <div class="feature-metric"><span data-es>↑ 3x más visualizaciones que video horizontal</span><span data-en>↑ 3x more views than horizontal video</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">🔴</div>
-        <div class="feature-title">Clases en Vivo Integradas</div>
-        <div class="feature-desc">Sesiones live directamente en la plataforma, con asistencia, grabación automática y replay disponible.</div>
-        <div class="feature-metric">Sin cambios de app ni Zoom externo</div>
+        <div class="feature-title"><span data-es>Clases en Vivo Integradas</span><span data-en>Integrated Live Classes</span></div>
+        <div class="feature-desc"><span data-es>Sesiones live directamente en la plataforma, con asistencia, grabación automática y replay disponible.</span><span data-en>Live sessions directly on the platform, with attendance, auto-recording and replay.</span></div>
+        <div class="feature-metric"><span data-es>Sin cambios de app ni Zoom externo</span><span data-en>No app switching or external Zoom</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">🎯</div>
-        <div class="feature-title">Presentaciones Interactivas</div>
-        <div class="feature-desc">Slides con preguntas, evaluaciones y métricas de atención. No solo ven, participan.</div>
-        <div class="feature-metric">Hasta 91% retención de conocimiento</div>
+        <div class="feature-title"><span data-es>Presentaciones Interactivas</span><span data-en>Interactive Presentations</span></div>
+        <div class="feature-desc"><span data-es>Slides con preguntas, evaluaciones y métricas de atención. No solo ven, participan.</span><span data-en>Slides with questions, evaluations, and attention metrics. They don't just watch, they participate.</span></div>
+        <div class="feature-metric"><span data-es>Hasta 91% retención de conocimiento</span><span data-en>Up to 91% knowledge retention</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">🏷️</div>
-        <div class="feature-title">100% White-Label</div>
-        <div class="feature-desc">Tu logo, tu dominio, tus colores. Tus alumnos nunca saben que usas MeWe Academy.</div>
-        <div class="feature-metric">Profesionalismo desde el primer día</div>
+        <div class="feature-title"><span data-es>100% White-Label</span><span data-en>100% White-Label</span></div>
+        <div class="feature-desc"><span data-es>Tu logo, tu dominio, tus colores. Tus alumnos nunca saben que usas MeWe Academy.</span><span data-en>Your logo, your domain, your colors. Students never know you're using MeWe Academy.</span></div>
+        <div class="feature-metric"><span data-es>Profesionalismo desde el primer día</span><span data-en>Professional from day one</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">📊</div>
-        <div class="feature-title">Analytics de Aprendizaje</div>
-        <div class="feature-desc">Ve exactamente qué aprendió cada persona, cuándo, cuánto tiempo y con qué resultado.</div>
-        <div class="feature-metric">Reportes exportables para dirección</div>
+        <div class="feature-title"><span data-es>Analytics de Aprendizaje</span><span data-en>Learning Analytics</span></div>
+        <div class="feature-desc"><span data-es>Ve exactamente qué aprendió cada persona, cuándo, cuánto tiempo y con qué resultado.</span><span data-en>See exactly what each person learned, when, how long, and with what outcome.</span></div>
+        <div class="feature-metric"><span data-es>Reportes exportables para dirección</span><span data-en>Exportable reports for management</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">🎓</div>
-        <div class="feature-title">Exámenes y Certificados</div>
-        <div class="feature-desc">Evaluaciones automatizadas con certificados digitales verificables. Valor real para tus colaboradores.</div>
-        <div class="feature-metric">Certificados con tu firma y sello</div>
+        <div class="feature-title"><span data-es>Exámenes y Certificados</span><span data-en>Exams & Certificates</span></div>
+        <div class="feature-desc"><span data-es>Evaluaciones automatizadas con certificados digitales verificables. Valor real para tus colaboradores.</span><span data-en>Automated assessments with verifiable digital certificates. Real value for your team.</span></div>
+        <div class="feature-metric"><span data-es>Certificados con tu firma y sello</span><span data-en>Certificates with your signature and seal</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">👥</div>
-        <div class="feature-title">Multi-rol y Multi-academia</div>
-        <div class="feature-desc">Superadmin, maestros, alumnos y academias independientes bajo un mismo techo. Escala sin fricción.</div>
-        <div class="feature-metric">Para franquicias y grupos empresariales</div>
+        <div class="feature-title"><span data-es>Multi-rol y Multi-academia</span><span data-en>Multi-role & Multi-academy</span></div>
+        <div class="feature-desc"><span data-es>Superadmin, maestros, alumnos y academias independientes bajo un mismo techo. Escala sin fricción.</span><span data-en>Superadmin, teachers, students and independent academies under one roof. Scale without friction.</span></div>
+        <div class="feature-metric"><span data-es>Para franquicias y grupos empresariales</span><span data-en>For franchises and business groups</span></div>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">📱</div>
         <div class="feature-title">Mobile First</div>
-        <div class="feature-desc">Tu equipo aprende desde cualquier dispositivo. Experiencia nativa en iOS y Android.</div>
-        <div class="feature-metric">78% de sesiones en móvil</div>
+        <div class="feature-desc"><span data-es>Tu equipo aprende desde cualquier dispositivo. Experiencia nativa en iOS y Android.</span><span data-en>Your team learns from any device. Native experience on iOS and Android.</span></div>
+        <div class="feature-metric"><span data-es>78% de sesiones en móvil</span><span data-en>78% of sessions on mobile</span></div>
       </div>
     </div>
   </div>
@@ -775,36 +561,36 @@
 <!-- ═══════════ HOW IT WORKS ═══════════ -->
 <section class="section">
   <div class="section-inner">
-    <span class="section-tag reveal">El proceso</span>
-    <h2 class="section-h2 reveal">De cero a tu academia en 6 semanas</h2>
-    <p class="section-lead reveal">Sin departamentos de IT ni meses de configuración.</p>
+    <span class="section-tag reveal"><span data-es>El proceso</span><span data-en>The process</span></span>
+    <h2 class="section-h2 reveal"><span data-es>De cero a tu academia en 6 semanas</span><span data-en>From zero to your academy in 6 weeks</span></h2>
+    <p class="section-lead reveal"><span data-es>Sin departamentos de IT ni meses de configuración.</span><span data-en>No IT departments or months of setup.</span></p>
     <div class="steps" style="max-width:720px;">
       <div class="step reveal">
         <div class="step-num">01</div>
         <div>
-          <div class="step-title">Kickoff y configuración de marca</div>
-          <div class="step-desc">Configuramos tu plataforma con tu identidad: logo, colores, dominio y estructura. En 48 horas ya tienes tu academia lista.</div>
+          <div class="step-title"><span data-es>Kickoff y configuración de marca</span><span data-en>Kickoff & brand setup</span></div>
+          <div class="step-desc"><span data-es>Configuramos tu plataforma con tu identidad: logo, colores, dominio y estructura. En 48 horas ya tienes tu academia lista.</span><span data-en>We set up your platform with your identity: logo, colors, domain, and structure. In 48 hours your academy is ready.</span></div>
         </div>
       </div>
       <div class="step reveal">
         <div class="step-num">02</div>
         <div>
-          <div class="step-title">Carga tu primer contenido</div>
-          <div class="step-desc">Sube videos, crea presentaciones interactivas o programa tu primera clase en vivo. Interfaz tan simple como subir un video a YouTube.</div>
+          <div class="step-title"><span data-es>Carga tu primer contenido</span><span data-en>Upload your first content</span></div>
+          <div class="step-desc"><span data-es>Sube videos, crea presentaciones interactivas o programa tu primera clase en vivo. Interfaz tan simple como subir un video a YouTube.</span><span data-en>Upload videos, create interactive presentations or schedule your first live class. As simple as uploading to YouTube.</span></div>
         </div>
       </div>
       <div class="step reveal">
         <div class="step-num">03</div>
         <div>
-          <div class="step-title">Invita a tus equipos</div>
-          <div class="step-desc">Importa usuarios en masa o comparte un link de registro. Asigna roles, grupos y programas de capacitación en segundos.</div>
+          <div class="step-title"><span data-es>Invita a tus equipos</span><span data-en>Invite your teams</span></div>
+          <div class="step-desc"><span data-es>Importa usuarios en masa o comparte un link de registro. Asigna roles, grupos y programas en segundos.</span><span data-en>Import users in bulk or share a registration link. Assign roles, groups and programs in seconds.</span></div>
         </div>
       </div>
       <div class="step reveal">
         <div class="step-num">04</div>
         <div>
-          <div class="step-title">Mide y optimiza</div>
-          <div class="step-desc">Dashboard en tiempo real con retención, completamiento y engagement. Sabe exactamente qué está funcionando y qué necesita ajuste.</div>
+          <div class="step-title"><span data-es>Mide y optimiza</span><span data-en>Measure & optimize</span></div>
+          <div class="step-desc"><span data-es>Dashboard en tiempo real con retención, completamiento y engagement. Sabe exactamente qué está funcionando y qué necesita ajuste.</span><span data-en>Real-time dashboard with retention, completion and engagement. Know exactly what's working and what needs adjustment.</span></div>
         </div>
       </div>
     </div>
@@ -814,158 +600,116 @@
 <!-- ═══════════ PRICING ═══════════ -->
 <section class="section" id="precios" style="background:var(--bg-2);">
   <div class="section-inner">
-    <span class="section-tag reveal" style="text-align:center;display:block;">Planes</span>
-    <h2 class="section-h2 reveal" style="text-align:center;">Precios para cada etapa de tu organización</h2>
-    <p class="section-lead reveal" style="text-align:center;margin:0 auto 0;">Sin comisiones por ventas. Sin costos ocultos. Paga por usuarios, no por cursos.</p>
+    <span class="section-tag reveal" style="text-align:center;display:block;"><span data-es>Planes</span><span data-en>Plans</span></span>
+    <h2 class="section-h2 reveal" style="text-align:center;"><span data-es>Precios para cada etapa de tu organización</span><span data-en>Pricing for every stage of your organization</span></h2>
+    <p class="section-lead reveal" style="text-align:center;margin:0 auto;">
+      <span data-es>Sin comisiones por ventas. Sin costos ocultos. Paga por usuarios, no por cursos.</span>
+      <span data-en>No sales commissions. No hidden costs. Pay per user, not per course.</span>
+    </p>
     <div class="pricing-grid reveal">
       <!-- STARTER -->
       <div class="price-card starter">
         <div class="price-name">Starter</div>
         <div class="price-amount">$199</div>
-        <div class="price-period">/ mes · facturado anualmente</div>
+        <div class="price-period"><span data-es>/ mes · facturado anualmente</span><span data-en>/ month · billed annually</span></div>
         <div class="price-divider"></div>
         <ul class="price-features">
-          <li class="price-feature"><span class="price-check">✓</span> 1 instructor</li>
-          <li class="price-feature"><span class="price-check">✓</span> 50 alumnos activos</li>
-          <li class="price-feature"><span class="price-check">✓</span> 5 cursos</li>
-          <li class="price-feature"><span class="price-check">✓</span> Presentaciones interactivas</li>
-          <li class="price-feature"><span class="price-check">✓</span> Exámenes y certificados</li>
-          <li class="price-feature"><span class="price-check">✓</span> White-label básico</li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>1 instructor</span><span data-en>1 instructor</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>50 alumnos activos</span><span data-en>50 active students</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>5 cursos</span><span data-en>5 courses</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Presentaciones interactivas</span><span data-en>Interactive presentations</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Exámenes y certificados</span><span data-en>Exams and certificates</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>White-label básico</span><span data-en>Basic white-label</span></li>
         </ul>
-        <a href="#" class="price-cta starter-cta">Comenzar prueba gratuita</a>
+        <a href="#" class="price-cta starter-cta"><span data-es>Comenzar prueba gratuita</span><span data-en>Start free trial</span></a>
       </div>
-
       <!-- PROFESSIONAL -->
       <div class="price-card pro">
-        <div class="price-badge recommended">Recomendado</div>
+        <div class="price-badge recommended"><span data-es>Recomendado</span><span data-en>Recommended</span></div>
         <div class="price-name">Professional</div>
         <div class="price-amount">$699</div>
-        <div class="price-period">/ mes · facturado anualmente</div>
+        <div class="price-period"><span data-es>/ mes · facturado anualmente</span><span data-en>/ month · billed annually</span></div>
         <div class="price-divider"></div>
         <ul class="price-features">
-          <li class="price-feature"><span class="price-check">✓</span> 5 instructores</li>
-          <li class="price-feature"><span class="price-check">✓</span> 300 alumnos activos</li>
-          <li class="price-feature"><span class="price-check">✓</span> 50 cursos</li>
-          <li class="price-feature"><span class="price-check">✓</span> Clases en vivo integradas</li>
-          <li class="price-feature"><span class="price-check">✓</span> Analytics dashboard completo</li>
-          <li class="price-feature"><span class="price-check">✓</span> Video feed vertical (TikTok-style)</li>
-          <li class="price-feature"><span class="price-check">✓</span> White-label completo</li>
-          <li class="price-feature"><span class="price-check">✓</span> Soporte prioritario</li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>5 instructores</span><span data-en>5 instructors</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>300 alumnos activos</span><span data-en>300 active students</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>50 cursos</span><span data-en>50 courses</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Clases en vivo integradas</span><span data-en>Integrated live classes</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Analytics dashboard completo</span><span data-en>Full analytics dashboard</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Video feed vertical (TikTok-style)</span><span data-en>Vertical video feed (TikTok-style)</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>White-label completo</span><span data-en>Full white-label</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Soporte prioritario</span><span data-en>Priority support</span></li>
         </ul>
-        <a href="#" class="price-cta pro-cta">Solicitar demo →</a>
+        <a href="#" class="price-cta pro-cta"><span data-es>Solicitar demo →</span><span data-en>Request demo →</span></a>
       </div>
-
       <!-- ENTERPRISE -->
       <div class="price-card enterprise">
         <div class="price-name">Enterprise</div>
         <div class="price-amount">$2,500</div>
-        <div class="price-period">/ mes · contrato anual</div>
+        <div class="price-period"><span data-es>/ mes · contrato anual</span><span data-en>/ month · annual contract</span></div>
         <div class="price-divider"></div>
         <ul class="price-features">
-          <li class="price-feature"><span class="price-check">✓</span> Instructores ilimitados</li>
-          <li class="price-feature"><span class="price-check">✓</span> Alumnos ilimitados</li>
-          <li class="price-feature"><span class="price-check">✓</span> Cursos ilimitados</li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Instructores ilimitados</span><span data-en>Unlimited instructors</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Alumnos ilimitados</span><span data-en>Unlimited students</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Cursos ilimitados</span><span data-en>Unlimited courses</span></li>
           <li class="price-feature"><span class="price-check">✓</span> SSO (Single Sign-On)</li>
-          <li class="price-feature"><span class="price-check">✓</span> Integraciones API</li>
-          <li class="price-feature"><span class="price-check">✓</span> Analytics avanzados</li>
-          <li class="price-feature"><span class="price-check">✓</span> Onboarding dedicado</li>
-          <li class="price-feature"><span class="price-check">✓</span> Soporte 24/7 prioritario</li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Integraciones API</span><span data-en>API integrations</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Analytics avanzados</span><span data-en>Advanced analytics</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Onboarding dedicado</span><span data-en>Dedicated onboarding</span></li>
+          <li class="price-feature"><span class="price-check">✓</span> <span data-es>Soporte 24/7 prioritario</span><span data-en>24/7 priority support</span></li>
         </ul>
-        <a href="#" class="price-cta enterprise-cta">Hablar con ventas</a>
+        <a href="#" class="price-cta enterprise-cta"><span data-es>Hablar con ventas</span><span data-en>Talk to sales</span></a>
       </div>
     </div>
     <p class="pricing-note">
-      <strong>Planes Enterprise Plus</strong> disponibles para universidades y corporativos con más de 1,000 usuarios.
-      También disponible por usuario: <strong>$10/alumno</strong> · <strong>$25/maestro</strong>.
+      <span data-es><strong>Planes Enterprise Plus</strong> disponibles para universidades y corporativos con más de 1,000 usuarios. También disponible por usuario: <strong>$10/alumno</strong> · <strong>$25/maestro</strong>.</span>
+      <span data-en><strong>Enterprise Plus plans</strong> available for universities and corporations with over 1,000 users. Also available per user: <strong>$10/student</strong> · <strong>$25/instructor</strong>.</span>
     </p>
-  </div>
-</section>
-
-<!-- ═══════════ TESTIMONIALS ═══════════ -->
-<section class="section">
-  <div class="section-inner">
-    <span class="section-tag reveal" style="text-align:center;display:block;">Testimonios</span>
-    <h2 class="section-h2 reveal" style="text-align:center;">Lo que dicen quienes ya lo usan</h2>
-    <div class="testimonials-grid">
-      <div class="testimonial reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testimonial-quote">"Antes teníamos videos en Drive y PDFs en WhatsApp. Con MeWe Academy, nuestra academia de ventas tiene identidad propia. Los números de retención subieron 40% en 3 meses."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">CA</div>
-          <div>
-            <div class="author-name">Carlos A.</div>
-            <div class="author-role">Director Comercial · Empresa de 200 personas</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testimonial-quote">"El formato de video vertical fue un game changer. Nuestros vendedores ven el contenido en el metro. La tasa de completamiento pasó del 12% al 67% en el primer mes."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">ML</div>
-          <div>
-            <div class="author-name">María L.</div>
-            <div class="author-role">VP de People · Franquicia con 8 sucursales</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testimonial-quote">"Implementamos en 4 semanas. El white-label nos permitió presentarlo como nuestra propia plataforma ante clientes. Eso elevó nuestra propuesta de valor por sí solo."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">JR</div>
-          <div>
-            <div class="author-name">José R.</div>
-            <div class="author-role">CEO · Consultora de Recursos Humanos</div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
 <!-- ═══════════ FAQ ═══════════ -->
 <section class="section" style="background:var(--bg-2);">
   <div class="section-inner">
-    <span class="section-tag reveal" style="text-align:center;display:block;">Preguntas frecuentes</span>
-    <h2 class="section-h2 reveal" style="text-align:center;">Respuestas directas</h2>
+    <span class="section-tag reveal" style="text-align:center;display:block;"><span data-es>Preguntas frecuentes</span><span data-en>FAQ</span></span>
+    <h2 class="section-h2 reveal" style="text-align:center;"><span data-es>Respuestas directas</span><span data-en>Straight answers</span></h2>
     <div class="faq-list reveal">
       <details>
-        <summary>¿Cuánto tiempo toma implementar MeWe Academy?</summary>
-        <div class="faq-answer">La configuración inicial (marca, dominio, primeros cursos) toma entre 48 horas y 2 semanas. La implementación completa con todos los equipos entrenados promedia 6 semanas.</div>
+        <summary><span data-es>¿Cuánto tiempo toma implementar MeWe Academy?</span><span data-en>How long does it take to implement MeWe Academy?</span></summary>
+        <div class="faq-answer"><span data-es>La configuración inicial toma entre 48 horas y 2 semanas. La implementación completa promedia 6 semanas.</span><span data-en>Initial setup takes between 48 hours and 2 weeks. Full implementation averages 6 weeks.</span></div>
       </details>
       <details>
-        <summary>¿Necesito un equipo técnico para administrarla?</summary>
-        <div class="faq-answer">No. El panel de administración está diseñado para directores de capacitación y líderes de RH, no para desarrolladores. Si sabes usar Netflix, sabes usar MeWe Academy.</div>
+        <summary><span data-es>¿Necesito un equipo técnico para administrarla?</span><span data-en>Do I need a technical team to manage it?</span></summary>
+        <div class="faq-answer"><span data-es>No. El panel está diseñado para directores de capacitación, no para desarrolladores. Si sabes usar Netflix, sabes usar MeWe Academy.</span><span data-en>No. The dashboard is designed for training directors, not developers. If you can use Netflix, you can use MeWe Academy.</span></div>
       </details>
       <details>
-        <summary>¿Qué diferencia hay con Talent LMS, Docebo o Moodle?</summary>
-        <div class="faq-answer">La diferencia principal es el enfoque en engagement y retención: video vertical, clases en vivo integradas y presentaciones interactivas. Además, nuestro modelo white-label es real — tu marca aparece en todo, incluyendo el dominio y los emails.</div>
+        <summary><span data-es>¿Qué diferencia hay con Talent LMS, Docebo o Moodle?</span><span data-en>How is it different from Talent LMS, Docebo or Moodle?</span></summary>
+        <div class="faq-answer"><span data-es>La diferencia principal es el enfoque en engagement y retención: video vertical, clases en vivo y presentaciones interactivas. Además, nuestro white-label es real — tu marca en todo.</span><span data-en>The main difference is our focus on engagement and retention: vertical video, live classes and interactive presentations. Our white-label is real — your brand everywhere.</span></div>
       </details>
       <details>
-        <summary>¿Puedo migrar contenido que ya tengo?</summary>
-        <div class="faq-answer">Sí. Importamos videos de YouTube, Vimeo, Drive, y documentos PDF/PPT. También tenemos proceso de migración asistida para clientes Enterprise.</div>
+        <summary><span data-es>¿Puedo migrar contenido que ya tengo?</span><span data-en>Can I migrate content I already have?</span></summary>
+        <div class="faq-answer"><span data-es>Sí. Importamos videos de YouTube, Vimeo, Drive, y documentos PDF/PPT. También tenemos proceso de migración asistida para Enterprise.</span><span data-en>Yes. We import videos from YouTube, Vimeo, Drive, and PDF/PPT documents. We also have an assisted migration process for Enterprise.</span></div>
       </details>
       <details>
-        <summary>¿Hay contrato de permanencia?</summary>
-        <div class="faq-answer">Los planes Starter y Professional son mensuales (o anuales con descuento). Enterprise requiere contrato anual. Puedes cancelar con 30 días de aviso en cualquier plan mensual.</div>
+        <summary><span data-es>¿Hay contrato de permanencia?</span><span data-en>Is there a long-term contract?</span></summary>
+        <div class="faq-answer"><span data-es>Los planes Starter y Professional son mensuales o anuales. Enterprise requiere contrato anual. Puedes cancelar con 30 días de aviso.</span><span data-en>Starter and Professional plans are monthly or annual. Enterprise requires an annual contract. You can cancel with 30 days' notice.</span></div>
       </details>
     </div>
     <div class="guarantee reveal">
       <div class="guarantee-icon">🛡️</div>
-      <h3>Garantía de 30 días sin riesgo</h3>
-      <p>Si en los primeros 30 días no ves resultados medibles en participación de tu equipo, te devolvemos el 100% de tu inversión. Sin preguntas, sin burocracia.</p>
+      <h3><span data-es>Garantía de 30 días sin riesgo</span><span data-en>30-day risk-free guarantee</span></h3>
+      <p><span data-es>Si en los primeros 30 días no ves resultados medibles en participación de tu equipo, te devolvemos el 100% de tu inversión. Sin preguntas, sin burocracia.</span><span data-en>If in the first 30 days you don't see measurable results in your team's participation, we'll refund 100% of your investment. No questions, no hassle.</span></p>
     </div>
   </div>
 </section>
 
 <!-- ═══════════ FINAL CTA ═══════════ -->
 <section class="cta-section">
-  <h2>El conocimiento que no se retiene, no existe.</h2>
-  <p>Únete a las organizaciones que construyen ventaja competitiva real a través del aprendizaje.</p>
+  <h2><span data-es>El conocimiento que no se retiene, no existe.</span><span data-en>Knowledge that isn't retained, doesn't exist.</span></h2>
+  <p><span data-es>Únete a las organizaciones que construyen ventaja competitiva real a través del aprendizaje.</span><span data-en>Join the organizations building real competitive advantage through learning.</span></p>
   <div class="cta-btns">
-    <a href="#precios" class="btn-cta-terra">Solicitar demo gratuita →</a>
-    <a href="#precios" class="btn-cta-outline">Ver planes y precios</a>
+    <a href="#precios" class="btn-cta-terra"><span data-es>Solicitar demo gratuita →</span><span data-en>Request free demo →</span></a>
+    <a href="#precios" class="btn-cta-outline"><span data-es>Ver planes y precios</span><span data-en>See plans & pricing</span></a>
   </div>
 </section>
 
@@ -973,52 +717,59 @@
 <footer>
   <div class="footer-inner">
     <span class="footer-logo">MEWE ACADEMY</span>
-    <span class="footer-copy">© 2025 MeWe Academy. El sistema operativo del conocimiento organizacional.</span>
+    <span class="footer-copy">
+      © 2025 MeWe Academy. <span data-es>El sistema operativo del conocimiento organizacional.</span><span data-en>The operating system for organizational knowledge.</span>
+    </span>
   </div>
 </footer>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
 <script>
-  // ── GSAP ScrollTrigger Setup ──
+  // ── LANGUAGE TOGGLE ──
+  function setLang(lang) {
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    // Update page title
+    document.title = lang === 'es'
+      ? 'MeWe Academy — El sistema operativo del conocimiento organizacional'
+      : 'MeWe Academy — The Operating System for Organizational Knowledge';
+    // Save preference
+    try { localStorage.setItem('lang', lang); } catch(e){}
+  }
+  // Load saved language preference
+  (function(){
+    const saved = (function(){ try { return localStorage.getItem('lang'); } catch(e){ return null; } })();
+    const lang = saved || (navigator.language && navigator.language.startsWith('en') ? 'en' : 'es');
+    setLang(lang);
+  })();
+
+  // ── GSAP ANIMATIONS ──
   gsap.registerPlugin(ScrollTrigger);
 
-  // Scroll reveal global
   gsap.utils.toArray(".reveal").forEach((el) => {
     gsap.fromTo(el,
       { opacity: 0, y: 40 },
-      {
-        opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-        scrollTrigger: {
-          trigger: el,
-          start: "top 88%",
-          toggleActions: "play none none none"
-        }
+      { opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
       }
     );
   });
 
-  // Floating animation on dashboard mock
   gsap.to(".hero-mock", {
-    y: -12, duration: 2.8,
-    ease: "sine.inOut", yoyo: true, repeat: -1
+    y: -12, duration: 2.8, ease: "sine.inOut", yoyo: true, repeat: -1
   });
 
-  // Animated counters
   function animateCounters() {
     document.querySelectorAll(".counter").forEach((el) => {
       const target = parseInt(el.getAttribute("data-target"));
       ScrollTrigger.create({
-        trigger: el,
-        start: "top 90%",
-        once: true,
+        trigger: el, start: "top 90%", once: true,
         onEnter: () => {
           gsap.to({ val: 0 }, {
-            val: target,
-            duration: 1.6,
-            ease: "power2.out",
-            onUpdate: function() {
-              el.textContent = Math.round(this.targets()[0].val);
-            }
+            val: target, duration: 1.6, ease: "power2.out",
+            onUpdate: function() { el.textContent = Math.round(this.targets()[0].val); }
           });
         }
       });
@@ -1026,24 +777,13 @@
   }
   animateCounters();
 
-  // Hero content entrance
-  gsap.from(".hero-content > *", {
-    opacity: 0, y: 30, duration: 0.7, stagger: 0.12, ease: "power2.out", delay: 0.2
-  });
-  gsap.from(".dashboard-mock", {
-    opacity: 0, x: 40, duration: 0.9, ease: "power2.out", delay: 0.4
-  });
+  gsap.from(".hero-content > *", { opacity: 0, y: 30, duration: 0.7, stagger: 0.12, ease: "power2.out", delay: 0.2 });
+  gsap.from(".dashboard-mock", { opacity: 0, x: 40, duration: 0.9, ease: "power2.out", delay: 0.4 });
 
-  // Feature cards stagger
   ScrollTrigger.create({
-    trigger: ".features-grid",
-    start: "top 80%",
-    once: true,
+    trigger: ".features-grid", start: "top 80%", once: true,
     onEnter: () => {
-      gsap.from(".feature-card", {
-        opacity: 0, y: 30, duration: 0.5,
-        stagger: 0.08, ease: "power2.out"
-      });
+      gsap.from(".feature-card", { opacity: 0, y: 30, duration: 0.5, stagger: 0.08, ease: "power2.out" });
     }
   });
 </script>
