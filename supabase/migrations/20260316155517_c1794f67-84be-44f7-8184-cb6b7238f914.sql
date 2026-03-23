@@ -1,0 +1,1 @@
+ALTER TABLE feedback_options ADD COLUMN is_correct boolean NOT NULL DEFAULT false;

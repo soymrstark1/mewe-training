@@ -1,0 +1,1 @@
+INSERT INTO public.global_settings (key, value) VALUES ('academy_brand_name', 'Mauricio Trachtman') ON CONFLICT DO NOTHING;

@@ -1,0 +1,2 @@
+ALTER TABLE teacher_slides DROP CONSTRAINT teacher_slides_teacher_id_slide_number_language_key;
+ALTER TABLE teacher_slides ADD CONSTRAINT teacher_slides_teacher_class_slide_lang_key UNIQUE (teacher_id, class_id, slide_number, language);

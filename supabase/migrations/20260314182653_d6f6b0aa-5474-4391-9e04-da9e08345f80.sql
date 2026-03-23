@@ -1,0 +1,1 @@
+ALTER TABLE public.users ADD COLUMN reviewed_at timestamptz DEFAULT NULL;

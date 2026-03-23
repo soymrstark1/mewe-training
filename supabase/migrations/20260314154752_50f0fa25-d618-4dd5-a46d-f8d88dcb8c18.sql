@@ -1,0 +1,1 @@
+ALTER TABLE teacher_slides ADD COLUMN content_type text NOT NULL DEFAULT 'slide';

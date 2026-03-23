@@ -1,0 +1,1 @@
+ALTER TABLE public.teacher_classes ADD COLUMN teacher_notes text NOT NULL DEFAULT '';

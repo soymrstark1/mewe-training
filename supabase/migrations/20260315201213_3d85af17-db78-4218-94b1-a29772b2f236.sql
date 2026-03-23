@@ -1,0 +1,1 @@
+ALTER TABLE public.teacher_slides ADD COLUMN thumbnail_url TEXT DEFAULT NULL;

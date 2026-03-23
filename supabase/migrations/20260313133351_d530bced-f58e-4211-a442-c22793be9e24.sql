@@ -1,0 +1,2 @@
+ALTER TABLE public.teacher_slides DROP CONSTRAINT IF EXISTS teacher_slides_class_id_fkey;
+ALTER TABLE public.teacher_slides ADD CONSTRAINT teacher_slides_class_id_fkey FOREIGN KEY (class_id) REFERENCES public.teacher_classes(id) ON DELETE SET NULL;
