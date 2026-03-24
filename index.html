@@ -851,6 +851,33 @@
     z-index: 9999;
     --elevenlabs-convai-button-color: #9B6B4A;
   }
+  /* Botón "Prefiero escribir" — flotante encima del widget */
+  .maia-escribe-btn {
+    position: fixed;
+    bottom: 110px;
+    right: 20px;
+    background: rgba(19,31,53,0.96);
+    border: 1px solid #34D399;
+    color: #34D399;
+    font-size: 0.78rem;
+    font-family: Inter, system-ui, sans-serif;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    z-index: 9998;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    letter-spacing: 0.03em;
+  }
+  .maia-escribe-btn:hover {
+    background: #34D399;
+    color: #0B1426;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52,211,153,0.3);
+  }
+
   /* Etiqueta flotante sobre el botón */
   .maia-label {
     position: fixed;
@@ -879,6 +906,10 @@
 </style>
 
 <div class="maia-label" id="maiaLabel">Habla con Maia 🎙️</div>
+<!-- Botón para agendar sin voz -->
+<button class="maia-escribe-btn" id="maiaEscribeBtn" title="Agendar cita sin usar el micrófono">
+  ✍️ Prefiero escribir
+</button>
 <elevenlabs-convai
   agent-id="agent_4401kmejq47mefxvnh2revct15j7"
   avatar-orb-color-1="#9B6B4A"
@@ -897,7 +928,11 @@
 </script>
 
 <script>
-/* ── MAIA: formulario de cita (v2) ── */
+/* ── MAIA: formulario de cita (v3) ──
+   Dos modos:
+   1. Activado por Maia (voz) → _resolveTool resuelve el tool call
+   2. Activado por botón "Prefiero escribir" → funciona solo, sin voz
+── */
 (function () {
   var SUPA_URL = 'https://ekjmohgyycbilwmxufpw.supabase.co';
   var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVram1vaGd5eWNiaWx3bXh1ZnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMjc5MTEsImV4cCI6MjA4OTkwMzkxMX0.Mcocv33gmTiOGVEPNdHf9MUyaWqBCcyEfMK2FTkqYu4';
@@ -905,21 +940,21 @@
   /* ── Inyectar estilos del modal ── */
   var style = document.createElement('style');
   style.textContent = [
-    '#maia-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2147483640;align-items:center;justify-content:center;padding:1rem}',
+    '#maia-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2147483640;align-items:center;justify-content:center;padding:1rem}',
     '#maia-overlay.visible{display:flex}',
-    '#maia-card{background:#131f35;border:1px solid #243558;border-radius:18px;padding:2rem 1.8rem;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:Inter,system-ui,sans-serif}',
+    '#maia-card{background:#131f35;border:1px solid #243558;border-radius:18px;padding:2rem 1.8rem;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.6);font-family:Inter,system-ui,sans-serif}',
     '#maia-card h2{color:#e2e8f0;font-size:1.25rem;margin-bottom:.3rem}',
-    '#maia-card p.sub{color:#94a3b8;font-size:.85rem;margin-bottom:1.4rem}',
-    '#maia-card label{display:block;color:#94a3b8;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;margin-top:.9rem}',
+    '#maia-card p.sub{color:#94a3b8;font-size:.85rem;margin-bottom:1.4rem;line-height:1.5}',
+    '#maia-card label{display:block;color:#94a3b8;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem;margin-top:.9rem}',
     '#maia-card label:first-of-type{margin-top:0}',
     '#maia-card input{width:100%;padding:.75rem 1rem;background:#0B1426;border:1px solid #243558;border-radius:10px;color:#e2e8f0;font-size:.95rem;outline:none;transition:border .2s;box-sizing:border-box}',
     '#maia-card input:focus{border-color:#34D399}',
     '#maia-card input::placeholder{color:#475569}',
     '.maia-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}',
-    '#maia-btn-confirmar{width:100%;margin-top:1.4rem;padding:.9rem;background:#34D399;color:#0B1426;border:none;border-radius:11px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}',
+    '#maia-btn-confirmar{width:100%;margin-top:1.4rem;padding:.9rem;background:#34D399;color:#0B1426;border:none;border-radius:11px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s;letter-spacing:.01em}',
     '#maia-btn-confirmar:hover{background:#10b981}',
     '#maia-btn-confirmar:disabled{background:#1a3a2a;color:#4b7a5e;cursor:not-allowed}',
-    '#maia-btn-cerrar{background:transparent;border:none;color:#94a3b8;font-size:1.3rem;cursor:pointer;float:right;margin-top:-4px;line-height:1}',
+    '#maia-btn-cerrar{background:transparent;border:none;color:#94a3b8;font-size:1.3rem;cursor:pointer;float:right;margin-top:-4px;line-height:1;padding:0}',
     '#maia-error{color:#f87171;font-size:.83rem;margin-top:.6rem;min-height:1em}'
   ].join('');
   document.head.appendChild(style);
@@ -930,22 +965,22 @@
   overlay.innerHTML = [
     '<div id="maia-card">',
     '  <button id="maia-btn-cerrar" aria-label="Cerrar">✕</button>',
-    '  <h2>📅 Confirma tu cita</h2>',
-    '  <p class="sub">Maia ya tiene tus datos — revísalos y agréganos tu teléfono.</p>',
-    '  <label for="maia-f-nombre">Nombre completo</label>',
+    '  <h2 id="maia-titulo">📅 Agenda tu demo</h2>',
+    '  <p class="sub" id="maia-subtitulo">Llena tus datos y te contactamos para coordinar tu demostración gratuita.</p>',
+    '  <label for="maia-f-nombre">Nombre completo *</label>',
     '  <input id="maia-f-nombre" type="text" placeholder="Tu nombre" autocomplete="name"/>',
     '  <label for="maia-f-empresa">Empresa</label>',
     '  <input id="maia-f-empresa" type="text" placeholder="Nombre de tu empresa" autocomplete="organization"/>',
-    '  <label for="maia-f-correo">Correo electrónico</label>',
+    '  <label for="maia-f-correo">Correo electrónico *</label>',
     '  <input id="maia-f-correo" type="email" placeholder="tucorreo@empresa.com" autocomplete="email"/>',
     '  <div class="maia-row">',
     '    <div>',
-    '      <label for="maia-f-telefono">Teléfono</label>',
+    '      <label for="maia-f-telefono">Teléfono *</label>',
     '      <input id="maia-f-telefono" type="tel" placeholder="ej. 5512345678" autocomplete="tel"/>',
     '    </div>',
     '    <div>',
-    '      <label for="maia-f-fecha">Fecha preferida</label>',
-    '      <input id="maia-f-fecha" type="text" placeholder="ej. Lunes por la mañana"/>',
+    '      <label for="maia-f-fecha">¿Cuándo te va bien?</label>',
+    '      <input id="maia-f-fecha" type="text" placeholder="ej. Lunes AM"/>',
     '    </div>',
     '  </div>',
     '  <div id="maia-error"></div>',
@@ -954,11 +989,17 @@
   ].join('');
   document.body.appendChild(overlay);
 
-  var _resolveTool = null;
+  var _resolveTool = null;   /* callback para completar el tool call de Maia */
+  var _callId      = null;   /* id del tool call activo */
+  var _widget      = null;   /* referencia al elemento elevenlabs-convai */
 
-  /* ── Mostrar formulario pre-llenado con lo que Maia escuchó ── */
-  function mostrarFormulario(params, onComplete) {
-    _resolveTool = onComplete;
+  /* ── Mostrar formulario ──
+     params    = datos pre-llenados (de Maia)
+     onComplete = función que resuelve el tool call (null si es modo directo)
+     esMaia    = true cuando viene de voz, false cuando viene del botón
+  ── */
+  function mostrarFormulario(params, onComplete, esMaia) {
+    _resolveTool = onComplete || null;
     var p = params || {};
     document.getElementById('maia-f-nombre').value   = (p.nombre          || '').trim();
     document.getElementById('maia-f-empresa').value  = (p.empresa         || '').trim();
@@ -966,9 +1007,21 @@
     document.getElementById('maia-f-telefono').value = (p.telefono        || '').trim();
     document.getElementById('maia-f-fecha').value    = (p.fecha_preferida || '').trim();
     document.getElementById('maia-error').textContent = '';
-    document.getElementById('maia-btn-confirmar').disabled = false;
+
+    /* Cambiar título según cómo se abrió */
+    if (esMaia) {
+      document.getElementById('maia-titulo').textContent    = '📅 Confirma tus datos';
+      document.getElementById('maia-subtitulo').textContent = 'Maia tomó nota de lo que le dijiste — revisa y corrige si hay algún error, especialmente el correo y teléfono.';
+    } else {
+      document.getElementById('maia-titulo').textContent    = '📅 Agenda tu demo';
+      document.getElementById('maia-subtitulo').textContent = 'Llena tus datos y te contactamos para coordinar tu demostración gratuita.';
+    }
+
+    var btn = document.getElementById('maia-btn-confirmar');
+    btn.disabled = false;
+    btn.textContent = 'Confirmar mi cita →';
     overlay.classList.add('visible');
-    setTimeout(function () { document.getElementById('maia-f-nombre').focus(); }, 100);
+    setTimeout(function () { document.getElementById('maia-f-nombre').focus(); }, 120);
   }
 
   function cerrarFormulario() {
@@ -989,11 +1042,11 @@
     });
   }
 
-  /* ── Mostrar toast de éxito ── */
+  /* ── Toast de confirmación ── */
   function mostrarToast(nombre, correo) {
     var t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:#34D399;color:#0B1426;padding:16px 28px;border-radius:14px;font-family:Inter,sans-serif;font-size:.95rem;font-weight:600;line-height:1.45;z-index:2147483647;max-width:88vw;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.45);opacity:0;transition:opacity .4s ease';
-    t.innerHTML = '✅ ¡Cita confirmada, ' + nombre + '!<br><span style="font-weight:400;font-size:.85rem">Te escribiremos a <strong>' + correo + '</strong></span>';
+    t.style.cssText = 'position:fixed;bottom:150px;left:50%;transform:translateX(-50%);background:#34D399;color:#0B1426;padding:16px 28px;border-radius:14px;font-family:Inter,sans-serif;font-size:.95rem;font-weight:600;line-height:1.5;z-index:2147483647;max-width:88vw;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .4s ease';
+    t.innerHTML = '✅ ¡Cita registrada, ' + nombre + '!<br><span style="font-weight:400;font-size:.85rem">Nos comunicaremos a <strong>' + correo + '</strong></span>';
     document.body.appendChild(t);
     requestAnimationFrame(function () { t.style.opacity = '1'; });
     setTimeout(function () { t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 500); }, 7000);
@@ -1008,9 +1061,12 @@
     var fecha    = document.getElementById('maia-f-fecha').value.trim();
     var errEl    = document.getElementById('maia-error');
 
-    if (!nombre)   { errEl.textContent = '⚠ Escribe tu nombre'; return; }
-    if (!correo || !/^[^@]+@[^@]+\.[^@]+$/.test(correo)) { errEl.textContent = '⚠ Correo no válido'; return; }
-    if (!telefono) { errEl.textContent = '⚠ Escribe tu teléfono'; return; }
+    if (!nombre)   { errEl.textContent = '⚠ Por favor escribe tu nombre'; return; }
+    if (!correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) {
+      errEl.textContent = '⚠ El correo no parece válido (verifica que tenga @ y punto)';
+      return;
+    }
+    if (!telefono) { errEl.textContent = '⚠ Por favor escribe tu número de teléfono'; return; }
 
     var btn = document.getElementById('maia-btn-confirmar');
     btn.disabled = true;
@@ -1022,14 +1078,27 @@
         if (r.ok || r.status === 201) {
           cerrarFormulario();
           mostrarToast(nombre, correo);
-          if (typeof _resolveTool === 'function') _resolveTool({ success: true, nombre: nombre });
+
+          /* Si vino de Maia, completar el tool call para que pueda continuar hablando */
+          if (typeof _resolveTool === 'function') {
+            _resolveTool({ success: true, nombre: nombre });
+          }
+          /* Si el evento fue por DOM, despachar el resultado también */
+          if (_callId && _widget) {
+            try {
+              _widget.dispatchEvent(new CustomEvent('elevenlabs-convai:client-tool-result', {
+                detail: { tool_call_id: _callId, result: JSON.stringify({ success: true }), is_error: false }
+              }));
+            } catch (e) {}
+            _callId = null;
+          }
         } else {
           return r.text().then(function (txt) { throw new Error('HTTP ' + r.status + ': ' + txt); });
         }
       })
       .catch(function (err) {
         console.error('[Maia] Error al guardar:', err);
-        errEl.textContent = '⚠ Error al guardar. Intenta de nuevo.';
+        errEl.textContent = '⚠ Hubo un error al guardar. Intenta de nuevo.';
         btn.disabled = false;
         btn.textContent = 'Confirmar mi cita →';
       });
@@ -1037,51 +1106,90 @@
 
   document.getElementById('maia-btn-cerrar').addEventListener('click', cerrarFormulario);
   overlay.addEventListener('click', function (e) { if (e.target === overlay) cerrarFormulario(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrarFormulario(); });
 
-  /* ── Conectar con el widget ElevenLabs ── */
-  function conectarWidget() {
-    var widget = document.querySelector('elevenlabs-convai');
-    if (!widget) { setTimeout(conectarWidget, 600); return; }
+  /* ── Botón "Prefiero escribir" ── */
+  var btnEscribe = document.getElementById('maiaEscribeBtn');
+  if (btnEscribe) {
+    btnEscribe.addEventListener('click', function () {
+      mostrarFormulario({}, null, false); /* modo directo, sin voz */
+    });
+  }
 
-    /* Método 1: clientTools API (ElevenLabs >= v2) */
+  /* ── Registrar clientTools en el widget ── */
+  function registrarTools(widget) {
+    _widget = widget;
     try {
       widget.clientTools = {
         registrar_cita: function (params) {
+          console.log('[Maia] registrar_cita llamado con params:', params);
           return new Promise(function (resolve) {
-            mostrarFormulario(params || {}, resolve);
+            mostrarFormulario(params || {}, resolve, true);
           });
         }
       };
-    } catch (e) { console.warn('[Maia] clientTools no disponible:', e); }
+      console.log('[Maia] clientTools registrado correctamente');
+    } catch (e) {
+      console.warn('[Maia] No se pudo registrar clientTools:', e);
+    }
+  }
 
-    /* Método 2: DOM event listener (fallback) */
+  /* ── Conectar con el widget ElevenLabs ──
+     Intentamos en varios momentos porque el script del widget
+     carga de forma asíncrona y el custom element puede no estar
+     listo de inmediato.
+  ── */
+  var _widgetConectado = false;
+
+  function conectarWidget() {
+    if (_widgetConectado) return;
+    var widget = document.querySelector('elevenlabs-convai');
+    if (!widget) return; /* reintentamos vía los timeouts de abajo */
+
+    _widgetConectado = true;
+    console.log('[Maia] Widget encontrado — registrando herramientas');
+    registrarTools(widget);
+
+    /* Re-registrar cuando empiece una llamada (por si el widget hace reset) */
+    widget.addEventListener('elevenlabs-convai:call-start', function () {
+      console.log('[Maia] Llamada iniciada — re-registrando clientTools');
+      registrarTools(widget);
+    });
+
+    /* Fallback: escuchar el evento DOM del tool call */
     widget.addEventListener('elevenlabs-convai:client-tool-call', function (e) {
       var detail = e.detail || {};
-      /* ElevenLabs v2 estructura: detail.client_tool_call.tool_name */
       var call   = detail.client_tool_call || detail;
       var name   = call.tool_name || call.name || detail.tool_name || '';
       var params = call.parameters || call.params || detail.parameters || {};
       var callId = call.tool_call_id || detail.tool_call_id || null;
 
+      console.log('[Maia] client-tool-call recibido:', name, params, 'callId:', callId);
+
       if (name === 'registrar_cita') {
-        mostrarFormulario(params, function (result) {
-          /* Completar el tool call para que Maia pueda continuar */
-          if (callId) {
-            try {
-              widget.dispatchEvent(new CustomEvent('elevenlabs-convai:client-tool-result', {
-                detail: { tool_call_id: callId, result: JSON.stringify(result), is_error: false }
-              }));
-            } catch (e) {}
-          }
-        });
+        _callId = callId;
+        mostrarFormulario(params, null, true); /* _callId se despacha en el submit */
       }
     });
   }
 
+  /* Intentar conectar en múltiples momentos */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', conectarWidget);
   } else {
     conectarWidget();
+  }
+  /* El script de ElevenLabs es async, puede cargar después */
+  setTimeout(conectarWidget, 800);
+  setTimeout(conectarWidget, 2000);
+  setTimeout(conectarWidget, 4000);
+
+  /* whenDefined si el browser lo soporta */
+  if (typeof customElements !== 'undefined' && customElements.whenDefined) {
+    customElements.whenDefined('elevenlabs-convai').then(function () {
+      console.log('[Maia] customElements.whenDefined → elevenlabs-convai listo');
+      conectarWidget();
+    });
   }
 
 })();
