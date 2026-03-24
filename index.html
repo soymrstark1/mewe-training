@@ -353,7 +353,7 @@
         </button>
       </div>
       <a href="#precios" class="btn-ghost"><span data-es>Ver demo</span><span data-en>See demo</span></a>
-      <a href="#precios" class="btn-primary"><span data-es>Solicitar demo →</span><span data-en>Request demo →</span></a>
+      <button onclick="document.getElementById('maiaEscribeBtn').click()" class="btn-primary" style="border:none;cursor:pointer;font-family:inherit;"><span data-es>Solicitar demo →</span><span data-en>Request demo →</span></button>
     </div>
   </div>
 </nav>
@@ -382,10 +382,10 @@
         <span data-en>Where learning stops being content… and becomes infrastructure.</span>
       </p>
       <div class="hero-btns">
-        <a href="#precios" class="btn-hero btn-hero-primary">
+        <button onclick="document.getElementById('maiaEscribeBtn').click()" class="btn-hero btn-hero-primary" style="border:none;cursor:pointer;font-family:inherit;">
           <span data-es>Solicitar demo gratuita →</span>
           <span data-en>Request free demo →</span>
-        </a>
+        </button>
         <a href="#funciones" class="btn-hero btn-hero-outline">
           <span data-es>Ver funciones</span>
           <span data-en>See features</span>
@@ -674,7 +674,7 @@
           <li class="price-feature"><span class="price-check">✓</span> <span data-es>Exámenes y certificados</span><span data-en>Exams and certificates</span></li>
           <li class="price-feature"><span class="price-check">✓</span> <span data-es>White-label básico</span><span data-en>Basic white-label</span></li>
         </ul>
-        <a href="#" class="price-cta starter-cta"><span data-es>Comenzar prueba gratuita</span><span data-en>Start free trial</span></a>
+        <button onclick="document.getElementById('maiaEscribeBtn').click()" class="price-cta starter-cta" style="border:1.5px solid var(--border);cursor:pointer;font-family:inherit;font-size:.9rem;"><span data-es>Solicitar información →</span><span data-en>Request info →</span></button>
       </div>
       <!-- PROFESSIONAL -->
       <div class="price-card pro">
@@ -693,7 +693,7 @@
           <li class="price-feature"><span class="price-check">✓</span> <span data-es>White-label completo</span><span data-en>Full white-label</span></li>
           <li class="price-feature"><span class="price-check">✓</span> <span data-es>Soporte prioritario</span><span data-en>Priority support</span></li>
         </ul>
-        <a href="#" class="price-cta pro-cta"><span data-es>Solicitar demo →</span><span data-en>Request demo →</span></a>
+        <button onclick="document.getElementById('maiaEscribeBtn').click()" class="price-cta pro-cta" style="border:none;cursor:pointer;font-family:inherit;font-size:.9rem;"><span data-es>Solicitar demo →</span><span data-en>Request demo →</span></button>
       </div>
       <!-- ENTERPRISE -->
       <div class="price-card enterprise">
@@ -711,7 +711,7 @@
           <li class="price-feature"><span class="price-check">✓</span> <span data-es>Onboarding dedicado</span><span data-en>Dedicated onboarding</span></li>
           <li class="price-feature"><span class="price-check">✓</span> <span data-es>Soporte 24/7 prioritario</span><span data-en>24/7 priority support</span></li>
         </ul>
-        <a href="#" class="price-cta enterprise-cta"><span data-es>Hablar con ventas</span><span data-en>Talk to sales</span></a>
+        <button onclick="document.getElementById('maiaEscribeBtn').click()" class="price-cta enterprise-cta" style="cursor:pointer;font-family:inherit;font-size:.9rem;border:1.5px solid rgba(96,165,250,.25);"><span data-es>Hablar con ventas →</span><span data-en>Talk to sales →</span></button>
       </div>
     </div>
     <p class="pricing-note">
@@ -761,7 +761,7 @@
   <h2><span data-es>El conocimiento que no se retiene, no existe.</span><span data-en>Knowledge that isn't retained, doesn't exist.</span></h2>
   <p><span data-es>Únete a las organizaciones que construyen ventaja competitiva real a través del aprendizaje.</span><span data-en>Join the organizations building real competitive advantage through learning.</span></p>
   <div class="cta-btns">
-    <a href="#precios" class="btn-cta-terra"><span data-es>Solicitar demo gratuita →</span><span data-en>Request free demo →</span></a>
+    <button onclick="document.getElementById('maiaEscribeBtn').click()" class="btn-cta-terra" style="border:none;cursor:pointer;font-family:inherit;font-size:.95rem;"><span data-es>Solicitar demo gratuita →</span><span data-en>Request free demo →</span></button>
     <a href="#precios" class="btn-cta-outline"><span data-es>Ver planes y precios</span><span data-en>See plans & pricing</span></a>
   </div>
 </section>
@@ -851,31 +851,30 @@
     z-index: 9999;
     --elevenlabs-convai-button-color: #9B6B4A;
   }
-  /* Botón "Prefiero escribir" — flotante encima del widget */
+  /* Botón "Agenda tu demo" — lado IZQUIERDO, lejos del widget */
   .maia-escribe-btn {
     position: fixed;
-    bottom: 110px;
-    right: 20px;
-    background: rgba(19,31,53,0.96);
-    border: 1px solid #34D399;
-    color: #34D399;
-    font-size: 0.78rem;
+    bottom: 28px;
+    left: 28px;
+    background: #34D399;
+    border: none;
+    color: #0B1426;
+    font-size: 0.88rem;
     font-family: Inter, system-ui, sans-serif;
-    font-weight: 600;
-    padding: 8px 16px;
+    font-weight: 700;
+    padding: 13px 22px;
     border-radius: 999px;
     cursor: pointer;
-    z-index: 9998;
+    z-index: 9997;
     white-space: nowrap;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    letter-spacing: 0.03em;
+    box-shadow: 0 4px 20px rgba(52,211,153,0.45);
+    letter-spacing: 0.02em;
   }
   .maia-escribe-btn:hover {
-    background: #34D399;
-    color: #0B1426;
+    background: #10b981;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52,211,153,0.3);
+    box-shadow: 0 6px 28px rgba(52,211,153,0.55);
   }
 
   /* Etiqueta flotante sobre el botón */
@@ -906,9 +905,9 @@
 </style>
 
 <div class="maia-label" id="maiaLabel">Habla con Maia 🎙️</div>
-<!-- Botón para agendar sin voz -->
-<button class="maia-escribe-btn" id="maiaEscribeBtn" title="Agendar cita sin usar el micrófono">
-  ✍️ Prefiero escribir
+<!-- Botón flotante "Agenda tu demo" — lado izquierdo, siempre visible -->
+<button class="maia-escribe-btn" id="maiaEscribeBtn" title="Agendar demo sin usar el micrófono">
+  📅 Agenda tu demo
 </button>
 <elevenlabs-convai
   agent-id="agent_4401kmejq47mefxvnh2revct15j7"
@@ -965,8 +964,8 @@
   overlay.innerHTML = [
     '<div id="maia-card">',
     '  <button id="maia-btn-cerrar" aria-label="Cerrar">✕</button>',
-    '  <h2 id="maia-titulo">📅 Agenda tu demo</h2>',
-    '  <p class="sub" id="maia-subtitulo">Llena tus datos y te contactamos para coordinar tu demostración gratuita.</p>',
+    '  <h2 id="maia-titulo">📅 Agenda tu demo gratuita</h2>',
+    '  <p class="sub" id="maia-subtitulo">Llena tus datos y en menos de 24 horas te contactamos para coordinar la demostración. Todos los campos con * son requeridos.</p>',
     '  <label for="maia-f-nombre">Nombre completo *</label>',
     '  <input id="maia-f-nombre" type="text" placeholder="Tu nombre" autocomplete="name"/>',
     '  <label for="maia-f-empresa">Empresa</label>',
