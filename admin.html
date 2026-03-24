@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Citas MeWe Academy</title>
+  <link rel="icon" type="image/png" href="img/meweacademyfavicon.png"/>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0B1426;
+      --surface:  #131f35;
+      --card:     #1a2844;
+      --border:   #243558;
+      --green:    #34D399;
+      --green-dk: #10b981;
+      --red:      #f87171;
+      --red-dk:   #ef4444;
+      --text:     #e2e8f0;
+      --muted:    #94a3b8;
+      --radius:   14px;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+      text-align: center;
+    }
+    .login-card img { width: 64px; margin-bottom: 1.2rem; }
+    .login-card h1 { font-size: 1.4rem; margin-bottom: .3rem; }
+    .login-card p  { color: var(--muted); font-size: .9rem; margin-bottom: 1.8rem; }
+    .login-card input[type="password"] {
+      width: 100%;
+      padding: .85rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border .2s;
+      margin-bottom: 1rem;
+    }
+    .login-card input[type="password"]:focus { border-color: var(--green); }
+    .btn-green {
+      width: 100%;
+      padding: .9rem;
+      background: var(--green);
+      color: #0B1426;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .btn-green:hover  { background: var(--green-dk); }
+    .btn-green:active { transform: scale(.98); }
+    #login-error {
+      color: var(--red);
+      font-size: .85rem;
+      margin-top: .7rem;
+      min-height: 1.2em;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; }
+
+    /* Header */
+    .top-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .top-bar .brand {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .top-bar .brand img { width: 32px; }
+    .top-bar .badge {
+      background: var(--green);
+      color: #0B1426;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .2rem .55rem;
+      border-radius: 99px;
+    }
+    .top-bar .actions { display: flex; gap: .7rem; }
+    .btn-sm {
+      padding: .5rem .9rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      transition: background .15s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .btn-sm:hover { background: var(--border); }
+    .btn-sm.danger { border-color: var(--red); color: var(--red); }
+    .btn-sm.danger:hover { background: rgba(248,113,113,.1); }
+
+    /* Main content */
+    .main { padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
+
+    /* Stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.4rem;
+    }
+    .stat-card .label { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .4rem; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--green); }
+    .stat-card .sub   { color: var(--muted); font-size: .8rem; margin-top: .2rem; }
+
+    /* Search + table toolbar */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: .65rem 1rem .65rem 2.4rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: .9rem;
+      outline: none;
+      transition: border .2s;
+    }
+    .search-wrap input:focus { border-color: var(--green); }
+    .search-wrap .icon {
+      position: absolute;
+      left: .75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    /* Table */
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+    thead th {
+      background: var(--surface);
+      color: var(--muted);
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: .8rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(52,211,153,.04); }
+    tbody td { padding: .85rem 1rem; vertical-align: middle; }
+    .td-nombre { font-weight: 600; }
+    .td-correo { color: var(--muted); font-size: .82rem; }
+    .td-fecha  { color: var(--muted); font-size: .82rem; white-space: nowrap; }
+    .badge-empresa {
+      display: inline-block;
+      background: rgba(52,211,153,.12);
+      color: var(--green);
+      border-radius: 6px;
+      padding: .2rem .6rem;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+    .btn-delete {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--red);
+      border-radius: 7px;
+      padding: .35rem .65rem;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-delete:hover {
+      background: rgba(248,113,113,.1);
+      border-color: var(--red);
+    }
+
+    /* Estado vacío */
+    .empty-state {
+      padding: 3rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: .7rem; }
+    .empty-state p { font-size: .9rem; }
+
+    /* Loading */
+    .loading {
+      padding: 3rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-bottom: .7rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .8rem 1.4rem;
+      font-size: .9rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+    #toast.ok   { border-color: var(--green); color: var(--green); }
+    #toast.err  { border-color: var(--red);   color: var(--red); }
+
+    /* Modal confirmación borrar */
+    #confirm-modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    #confirm-modal.show { display: flex; }
+    .modal-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-card h3 { margin-bottom: .5rem; }
+    .modal-card p  { color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem; }
+    .modal-btns { display: flex; gap: .8rem; justify-content: center; }
+    .btn-cancel {
+      padding: .65rem 1.4rem;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-confirm-del {
+      padding: .65rem 1.4rem;
+      border-radius: 9px;
+      border: none;
+      background: var(--red-dk);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-confirm-del:hover { background: #dc2626; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .top-bar .brand span:not(.badge) { display: none; }
+      thead th:nth-child(2),
+      tbody td:nth-child(2) { display: none; } /* Ocultar empresa en móvil */
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ LOGIN ════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <img src="img/meweacademyfavicon.png" alt="MeWe Academy" onerror="this.style.display='none'"/>
+    <h1>MeWe Academy</h1>
+    <p>Acceso al panel de citas</p>
+    <input type="password" id="pwd-input" placeholder="Contraseña" autofocus/>
+    <button class="btn-green" onclick="intentarLogin()">Entrar →</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ════════════════════ DASHBOARD ════════════════════ -->
+<div id="dashboard">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="brand">
+      <img src="img/meweacademyfavicon.png" alt="" onerror="this.style.display='none'"/>
+      <span>MeWe Academy</span>
+      <span class="badge">Admin</span>
+    </div>
+    <div class="actions">
+      <button class="btn-sm" onclick="cargarCitas()">🔄 Actualizar</button>
+      <button class="btn-sm" onclick="exportarCSV()">⬇ CSV</button>
+      <button class="btn-sm danger" onclick="cerrarSesion()">Salir</button>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="main">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">Total de citas</div>
+        <div class="value" id="stat-total">—</div>
+        <div class="sub">registradas por Maia</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Última cita</div>
+        <div class="value" id="stat-ultima" style="font-size:1rem;padding-top:.4rem">—</div>
+        <div class="sub" id="stat-ultima-sub"></div>
+      </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <span class="icon">🔍</span>
+        <input type="text" id="buscador" placeholder="Buscar por nombre, empresa o correo…" oninput="filtrar()"/>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-wrap">
+      <div id="table-area">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Cargando citas…</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /dashboard -->
+
+<!-- Modal confirmar borrar -->
+<div id="confirm-modal">
+  <div class="modal-card">
+    <h3>¿Eliminar esta cita?</h3>
+    <p id="modal-nombre">Esta acción no se puede deshacer.</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-confirm-del" onclick="confirmarBorrar()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════ */
+var SUPA_URL = 'https://ekjmohgyycbilwmxufpw.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVram1vaGd5eWNiaWx3bXh1ZnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMjc5MTEsImV4cCI6MjA4OTkwMzkxMX0.Mcocv33gmTiOGVEPNdHf9MUyaWqBCcyEfMK2FTkqYu4';
+
+/* Contraseña: almacenada como hash SHA-256 para no tener texto plano */
+/* Hash de "MeWeAdmin2024!" */
+var PWD_HASH = 'e2e8b2d8413ce435cfbecd49b51bb522c70ad501bf723aed22cafcb1a49cf646';
+
+/* ═══════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════ */
+async function hashStr(str) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function intentarLogin() {
+  var pwd = document.getElementById('pwd-input').value;
+  var h   = await hashStr(pwd);
+  if (h === PWD_HASH) {
+    sessionStorage.setItem('maia_admin_ok', '1');
+    mostrarDashboard();
+  } else {
+    document.getElementById('login-error').textContent = '❌ Contraseña incorrecta';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+    setTimeout(function(){ document.getElementById('login-error').textContent = ''; }, 3000);
+  }
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') intentarLogin();
+});
+
+function cerrarSesion() {
+  sessionStorage.removeItem('maia_admin_ok');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pwd-input').value = '';
+}
+
+function mostrarDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  cargarCitas();
+}
+
+/* Revisar si ya está autenticado */
+if (sessionStorage.getItem('maia_admin_ok') === '1') mostrarDashboard();
+
+/* ═══════════════════════════════════════════════
+   DATOS — Supabase
+═══════════════════════════════════════════════ */
+var todasLasCitas = [];
+var pendientesBorrar = null;
+
+function supaHeaders() {
+  return {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json'
+  };
+}
+
+async function cargarCitas() {
+  document.getElementById('table-area').innerHTML =
+    '<div class="loading"><div class="spinner"></div><p>Cargando…</p></div>';
+
+  try {
+    var res = await fetch(
+      SUPA_URL + '/rest/v1/citas?select=*&order=created_at.desc',
+      { headers: supaHeaders() }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    todasLasCitas = data;
+    actualizarStats(data);
+    renderTabla(data);
+  } catch (err) {
+    document.getElementById('table-area').innerHTML =
+      '<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar: ' + err.message + '</p></div>';
+  }
+}
+
+function actualizarStats(citas) {
+  document.getElementById('stat-total').textContent = citas.length;
+  if (citas.length > 0) {
+    var ultima = citas[0];
+    document.getElementById('stat-ultima').textContent = ultima.nombre || '—';
+    var d = new Date(ultima.created_at);
+    document.getElementById('stat-ultima-sub').textContent =
+      d.toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) +
+      ' · ' + ultima.empresa;
+  }
+}
+
+function renderTabla(citas) {
+  if (citas.length === 0) {
+    document.getElementById('table-area').innerHTML =
+      '<div class="empty-state">' +
+      '<div class="icon">📭</div>' +
+      '<p>No hay citas registradas todavía.<br>Cuando Maia agende una, aparecerá aquí.</p>' +
+      '</div>';
+    return;
+  }
+
+  var rows = citas.map(function(c) {
+    var fecha_reg = new Date(c.created_at).toLocaleDateString('es-MX', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    return '<tr>' +
+      '<td class="td-nombre">' + esc(c.nombre) + '</td>' +
+      '<td><span class="badge-empresa">' + esc(c.empresa) + '</span></td>' +
+      '<td class="td-correo">' + esc(c.correo) + '</td>' +
+      '<td class="td-fecha">' + esc(c.fecha_preferida) + '</td>' +
+      '<td class="td-fecha">' + fecha_reg + '</td>' +
+      '<td><button class="btn-delete" onclick="pedirBorrar(' + c.id + ',\'' + esc(c.nombre) + '\')">Eliminar</button></td>' +
+      '</tr>';
+  }).join('');
+
+  document.getElementById('table-area').innerHTML =
+    '<table>' +
+    '<thead><tr>' +
+    '<th>Nombre</th><th>Empresa</th><th>Correo</th>' +
+    '<th>Fecha preferida</th><th>Registrado</th><th></th>' +
+    '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>';
+}
+
+function esc(s) {
+  if (!s) return '—';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════════════
+   BÚSQUEDA
+═══════════════════════════════════════════════ */
+function filtrar() {
+  var q = document.getElementById('buscador').value.toLowerCase();
+  if (!q) { renderTabla(todasLasCitas); return; }
+  var filtradas = todasLasCitas.filter(function(c) {
+    return (c.nombre        || '').toLowerCase().includes(q) ||
+           (c.empresa       || '').toLowerCase().includes(q) ||
+           (c.correo        || '').toLowerCase().includes(q) ||
+           (c.fecha_preferida || '').toLowerCase().includes(q);
+  });
+  renderTabla(filtradas);
+}
+
+/* ═══════════════════════════════════════════════
+   BORRAR
+═══════════════════════════════════════════════ */
+function pedirBorrar(id, nombre) {
+  pendientesBorrar = id;
+  document.getElementById('modal-nombre').textContent =
+    'Se eliminará la cita de "' + nombre + '". Esta acción no se puede deshacer.';
+  document.getElementById('confirm-modal').classList.add('show');
+}
+
+function cerrarModal() {
+  document.getElementById('confirm-modal').classList.remove('show');
+  pendientesBorrar = null;
+}
+
+async function confirmarBorrar() {
+  cerrarModal();
+  if (!pendientesBorrar) return;
+  var id = pendientesBorrar;
+  try {
+    var res = await fetch(
+      SUPA_URL + '/rest/v1/citas?id=eq.' + id,
+      { method: 'DELETE', headers: supaHeaders() }
+    );
+    if (res.ok || res.status === 204) {
+      todasLasCitas = todasLasCitas.filter(function(c){ return c.id !== id; });
+      actualizarStats(todasLasCitas);
+      renderTabla(todasLasCitas);
+      mostrarToast('✅ Cita eliminada', 'ok');
+    } else {
+      mostrarToast('❌ Error al eliminar (HTTP ' + res.status + ')', 'err');
+    }
+  } catch(err) {
+    mostrarToast('❌ Error: ' + err.message, 'err');
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   EXPORTAR CSV
+═══════════════════════════════════════════════ */
+function exportarCSV() {
+  if (todasLasCitas.length === 0) {
+    mostrarToast('⚠️ No hay citas para exportar', 'err');
+    return;
+  }
+  var cols = ['id','nombre','empresa','correo','fecha_preferida','created_at'];
+  var hdr  = cols.join(',') + '\n';
+  var rows = todasLasCitas.map(function(c) {
+    return cols.map(function(k){ return '"' + (c[k] || '').toString().replace(/"/g,'""') + '"'; }).join(',');
+  }).join('\n');
+  var blob = new Blob(['\uFEFF' + hdr + rows], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url;
+  a.download = 'citas-mewe-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  mostrarToast('⬇ CSV descargado', 'ok');
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+var _toastTimer = null;
+function mostrarToast(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + (tipo || '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ t.className = ''; }, 3000);
+}
+</script>
+</body>
+</html>
