@@ -549,6 +549,7 @@ function renderTabla(citas) {
       '<td class="td-nombre">' + esc(c.nombre) + '</td>' +
       '<td><span class="badge-empresa">' + esc(c.empresa) + '</span></td>' +
       '<td class="td-correo">' + esc(c.correo) + '</td>' +
+      '<td class="td-correo">' + esc(c.telefono || '—') + '</td>' +
       '<td class="td-fecha">' + esc(c.fecha_preferida) + '</td>' +
       '<td class="td-fecha">' + fecha_reg + '</td>' +
       '<td><button class="btn-delete" onclick="pedirBorrar(' + c.id + ',\'' + esc(c.nombre) + '\')">Eliminar</button></td>' +
@@ -559,7 +560,7 @@ function renderTabla(citas) {
     '<table>' +
     '<thead><tr>' +
     '<th>Nombre</th><th>Empresa</th><th>Correo</th>' +
-    '<th>Fecha preferida</th><th>Registrado</th><th></th>' +
+    '<th>Teléfono</th><th>Fecha preferida</th><th>Registrado</th><th></th>' +
     '</tr></thead>' +
     '<tbody>' + rows + '</tbody>' +
     '</table>';
@@ -632,7 +633,7 @@ function exportarCSV() {
     mostrarToast('⚠️ No hay citas para exportar', 'err');
     return;
   }
-  var cols = ['id','nombre','empresa','correo','fecha_preferida','created_at'];
+  var cols = ['id','nombre','empresa','correo','telefono','fecha_preferida','created_at'];
   var hdr  = cols.join(',') + '\n';
   var rows = todasLasCitas.map(function(c) {
     return cols.map(function(k){ return '"' + (c[k] || '').toString().replace(/"/g,'""') + '"'; }).join(',');
