@@ -908,6 +908,26 @@
 
     console.log('[Maia] registrar_cita recibido:', { nombre, empresa, correo, fecha });
 
+    /* ── Guardar en Supabase ── */
+    var SUPA_URL  = 'https://ekjmohgyycbilwmxufpw.supabase.co';
+    var SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVram1vaGd5eWNiaWx3bXh1ZnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMjc5MTEsImV4cCI6MjA4OTkwMzkxMX0.Mcocv33gmTiOGVEPNdHf9MUyaWqBCcyEfMK2FTkqYu4';
+    fetch(SUPA_URL + '/rest/v1/citas', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ nombre: nombre, empresa: empresa, correo: correo, fecha_preferida: fecha })
+    })
+    .then(function(r) {
+      console.log('[Maia] Supabase status:', r.status);
+    })
+    .catch(function(err) {
+      console.warn('[Maia] Supabase error:', err);
+    });
+
     /* Toast de confirmación visible para el visitante */
     var toast = document.createElement('div');
     toast.style.cssText = [
