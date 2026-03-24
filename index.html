@@ -895,5 +895,91 @@
     }
   }, 3000);
 </script>
+
+<script>
+/* ── MAIA: captura de citas agendadas (herramienta cliente registrar_cita) ── */
+(function () {
+
+  function mostrarConfirmacion(params) {
+    var nombre  = (params.nombre          || '').trim();
+    var empresa = (params.empresa         || '').trim();
+    var correo  = (params.correo          || '').trim();
+    var fecha   = (params.fecha_preferida || '').trim();
+
+    console.log('[Maia] registrar_cita recibido:', { nombre, empresa, correo, fecha });
+
+    /* Toast de confirmación visible para el visitante */
+    var toast = document.createElement('div');
+    toast.style.cssText = [
+      'position:fixed',
+      'bottom:130px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'background:#34D399',
+      'color:#0B1426',
+      'padding:16px 28px',
+      'border-radius:14px',
+      'font-family:Inter,sans-serif',
+      'font-size:.95rem',
+      'font-weight:600',
+      'line-height:1.45',
+      'z-index:999999',
+      'max-width:88vw',
+      'text-align:center',
+      'box-shadow:0 6px 24px rgba(0,0,0,.45)',
+      'opacity:0',
+      'transition:opacity .4s ease'
+    ].join(';');
+    toast.innerHTML =
+      '✅ ¡Cita registrada, ' + nombre + '!<br>' +
+      '<span style="font-weight:400;font-size:.85rem">Te escribiremos a <strong>' + correo + '</strong> para confirmar.</span>';
+    document.body.appendChild(toast);
+    requestAnimationFrame(function () { toast.style.opacity = '1'; });
+    setTimeout(function () {
+      toast.style.opacity = '0';
+      setTimeout(function () { toast.remove(); }, 500);
+    }, 7000);
+
+    /* Guardar en sessionStorage por si se necesita procesar después */
+    try {
+      sessionStorage.setItem('maia_ultima_cita', JSON.stringify({
+        nombre: nombre, empresa: empresa, correo: correo, fecha: fecha,
+        ts: new Date().toISOString()
+      }));
+    } catch (e) { /* ignora si no hay acceso a sessionStorage */ }
+  }
+
+  function conectarWidget() {
+    var widget = document.querySelector('elevenlabs-convai');
+    if (!widget) return;
+
+    /* ElevenLabs puede despachar el evento con distintos nombres según versión */
+    var eventNames = [
+      'elevenlabs-convai:client-tool-call',
+      'tool-call',
+      'tool',
+      'clienttoolcall'
+    ];
+
+    eventNames.forEach(function (evName) {
+      widget.addEventListener(evName, function (e) {
+        var detail = e.detail || {};
+        var toolName = detail.tool_name || detail.name || '';
+        if (toolName === 'registrar_cita') {
+          mostrarConfirmacion(detail.parameters || detail.params || {});
+        }
+      });
+    });
+  }
+
+  /* El widget carga async; esperar a que el elemento esté listo */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', conectarWidget);
+  } else {
+    conectarWidget();
+  }
+
+})();
+</script>
 </body>
 </html>
